@@ -34,6 +34,7 @@ app.get('/', (request, response) => {
 app.post('/death', jsonParser, (request, res) => {
     const uuid = request.body.uuid;
     const name = request.body.name;
+    const lastdeathreason = request.body.lastdeathreason;
     createConnection({
         type: "mysql",
         host: "localhost",
@@ -52,12 +53,10 @@ app.post('/death', jsonParser, (request, res) => {
         if (death === undefined) {
             death = new Death();
             death.uuid = uuid;
-            death.deathcount = 1;
-            death.name = name;
-        } else {
-            death.name = name;
-            death.deathcount++;
         }
+        death.name = name;
+        death.lastdeathreason = lastdeathreason;
+        death.deathcount++;
         await connection.manager.save(death);
         await connection.close();
     }).catch(error => console.log(error));
@@ -78,7 +77,7 @@ app.get('/deaths', jsonParser, (request, response) => {
         logging: false
     }).then(async connection => {
         const deathRepository = connection.getRepository(Death);
-        const deaths: Death[] = await deathRepository.find();
+        const deaths: Death[] = await deathRepository.find({order: {deathcount: "DESC"}});
         const deathDTO: DeathsDto = new DeathsDto();
         deathDTO.deaths = deaths;
         await connection.close();

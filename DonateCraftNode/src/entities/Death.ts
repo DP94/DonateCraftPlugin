@@ -14,4 +14,7 @@ export class Death {
 
     @Column()
     name!: string;
+
+    @Column()
+    lastdeathreason!: string;
 }

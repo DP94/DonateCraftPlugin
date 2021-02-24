@@ -2,10 +2,12 @@
 <table *ngIf="deaths" class="table table-striped">
   <tr>
     <th>Player</th>
+    <th>Last death reason</th>
     <th>Deaths</th>
   </tr>
   <tr *ngFor="let death of deaths" class="death-row">
     <td><img src='https://crafatar.com/avatars/{{ death.uuid}}'/> {{ death.name }}</td>
+    <td> {{ death.lastdeathreason }}</td>
     <td>{{ death.deathcount }}</td>
   </tr>
 </table>

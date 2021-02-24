@@ -5,17 +5,18 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import {DeathsDto} from "./dtos/deaths.dto";
 import path from "path";
+
 require('dotenv').config()
 
 const DC_DB_USERNAME = process.env.DC_DB_USERNAME;
 const DC_DB_PASSWORD = process.env.DC_DB_PASSWORD;
-if(!DC_DB_USERNAME) {
-  console.error("DC_DB_USERNAME not set");
-  process.exit(-1);
+if (!DC_DB_USERNAME) {
+    console.error("DC_DB_USERNAME not set");
+    process.exit(-1);
 }
-if(!DC_DB_PASSWORD) {
-  console.error("DC_DB_PASSWORD not set");
-  process.exit(-1);
+if (!DC_DB_PASSWORD) {
+    console.error("DC_DB_PASSWORD not set");
+    process.exit(-1);
 }
 
 const app = express();
@@ -32,38 +33,46 @@ app.get('/', (request, response) => {
 });
 
 app.post('/death', jsonParser, (request, res) => {
-    const uuid = request.body.uuid;
-    const name = request.body.name;
-    const lastdeathreason = request.body.lastdeathreason;
-    createConnection({
-        type: "mysql",
-        host: "localhost",
-        port: 3306,
-        username: DC_DB_USERNAME,
-        password: DC_DB_PASSWORD,
-        database: "donatecraft",
-        entities: [
-            Death
-        ],
-        synchronize: true,
-        logging: false
-    }).then(async connection => {
-        const deathRepository = connection.getRepository(Death);
-        let death: Death | undefined = await deathRepository.findOne({uuid: uuid})
-        if (death === undefined) {
-            death = new Death();
-            death.uuid = uuid;
+    const data: Death = request.body.death;
+    connectToDB().then(async connection => {
+        try {
+            const deathRepository = connection.getRepository(Death);
+            let death: Death | undefined = await deathRepository.findOne({uuid: data.uuid})
+            if (death === undefined) {
+                death = new Death();
+                death.uuid = data.uuid;
+            }
+            death.name = data.name;
+            death.lastdeathreason = data.lastdeathreason;
+            death.deathcount++;
+            await connection.manager.save(death);
+        } catch (e) {
+            console.log(e);
+        } finally {
+            await connection.close();
         }
-        death.name = name;
-        death.lastdeathreason = lastdeathreason;
-        death.deathcount++;
-        await connection.manager.save(death);
-        await connection.close();
     }).catch(error => console.log(error));
 });
 
 app.get('/deaths', jsonParser, (request, response) => {
-    createConnection({
+    connectToDB().then(async connection => {
+        try {
+            const deathRepository = connection.getRepository(Death);
+            const deaths: Death[] = await deathRepository.find({order: {deathcount: "DESC", lastdeathreason: "DESC"}});
+            const deathDTO: DeathsDto = new DeathsDto();
+            deathDTO.deaths = deaths;
+            response.setHeader('Content-Type', 'application/json');
+            response.end(JSON.stringify(deathDTO));
+        } catch (e) {
+            console.log(e);
+        } finally {
+            await connection.close();
+        }
+    }).catch(error => console.log(error));
+});
+
+function connectToDB() {
+    return createConnection({
         type: "mysql",
         host: "localhost",
         port: 3306,
@@ -75,13 +84,5 @@ app.get('/deaths', jsonParser, (request, response) => {
         ],
         synchronize: true,
         logging: false
-    }).then(async connection => {
-        const deathRepository = connection.getRepository(Death);
-        const deaths: Death[] = await deathRepository.find({order: {deathcount: "DESC"}});
-        const deathDTO: DeathsDto = new DeathsDto();
-        deathDTO.deaths = deaths;
-        await connection.close();
-        response.setHeader('Content-Type', 'application/json');
-        response.end(JSON.stringify(deathDTO));
-    }).catch(error => console.log(error));
-});
+    });
+}

@@ -11,4 +11,7 @@ export class Death {
 
     @Column()
     deathcount!: number;
+
+    @Column()
+    name!: string;
 }

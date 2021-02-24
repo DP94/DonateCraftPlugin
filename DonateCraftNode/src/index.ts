@@ -5,6 +5,18 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import {DeathsDto} from "./dtos/deaths.dto";
 import path from "path";
+require('dotenv').config()
+
+const DC_DB_USERNAME = process.env.DC_DB_USERNAME;
+const DC_DB_PASSWORD = process.env.DC_DB_PASSWORD;
+if(!DC_DB_USERNAME) {
+  console.error("DC_DB_USERNAME not set");
+  process.exit(-1);
+}
+if(!DC_DB_PASSWORD) {
+  console.error("DC_DB_PASSWORD not set");
+  process.exit(-1);
+}
 
 const app = express();
 const PORT = 8000;
@@ -26,8 +38,8 @@ app.post('/death', jsonParser, (request, res) => {
         type: "mysql",
         host: "localhost",
         port: 3306,
-        username: "dan",
-        password: "Suicune245",
+        username: DC_DB_USERNAME,
+        password: DC_DB_PASSWORD,
         database: "donatecraft",
         entities: [
             Death
@@ -56,8 +68,8 @@ app.get('/deaths', jsonParser, (request, response) => {
         type: "mysql",
         host: "localhost",
         port: 3306,
-        username: "dan",
-        password: "Suicune245",
+        username: DC_DB_USERNAME,
+        password: DC_DB_PASSWORD,
         database: "donatecraft",
         entities: [
             Death

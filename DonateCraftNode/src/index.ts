@@ -26,8 +26,8 @@ app.post('/death', jsonParser, (request, res) => {
         type: "mysql",
         host: "localhost",
         port: 3306,
-        username: "dan",
-        password: "Suicune245",
+        username: "placeholder",
+        password: "placeholder",
         database: "donatecraft",
         entities: [
             Death
@@ -56,8 +56,8 @@ app.get('/deaths', jsonParser, (request, response) => {
         type: "mysql",
         host: "localhost",
         port: 3306,
-        username: "dan",
-        password: "Suicune245",
+        username: "placeholder",
+        password: "placeholder",
         database: "donatecraft",
         entities: [
             Death

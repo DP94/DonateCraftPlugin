@@ -16,7 +16,7 @@ public class PlayerListener implements Listener {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://localhost:8000/death"))
                 .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString("{\"uuid\": \"" + event.getEntity().getUniqueId().toString() + "\", \"name:\" \"" + event.getEntity().getDisplayName() + "\"}"))
+                .POST(HttpRequest.BodyPublishers.ofString("{\"uuid\": \"" + event.getEntity().getUniqueId().toString() + "\", \"name\": \"" + event.getEntity().getDisplayName() + "\"}"))
                 .build();
         HttpClient client = HttpClient.newBuilder().build();
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())

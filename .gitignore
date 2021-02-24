@@ -2,6 +2,7 @@
 /DonateCraft/.idea
 /DonateCraftNode/node_modules/
 /DonateCraftNode/.idea
+/DonateCraftNode/.env
 /DonateCraftNode/build
 /DonateCraftNG/dist/
 /DonateCraftNG/.idea

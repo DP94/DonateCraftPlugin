@@ -10,7 +10,7 @@
       <div class="charity-info-wrapper">
         <span class="charity-info charity-name">{{ charity.name }}</span>
         <span class="charity-info charity-description"> {{ charity.description }}</span>
-        <a href="https://link.staging.justgiving.com/v1/charity/donate/charityId/{{charity.id}}?exiturl=http://changeme/callback?jgDonationId=JUSTGIVING-DONATION-ID"><button class="btn btn-success charity-donate charity-info">Donate</button></a>
+        <a href="https://link.staging.justgiving.com/v1/charity/donate/charityId/{{charity.id}}?exiturl=http://changeme/callback?data=JUSTGIVING-DONATION-ID|{{playerKey}}"><button class="btn btn-success charity-donate charity-info">Donate</button></a>
       </div>
     </td>
     </tr>

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {Charity} from '../response/charity';
 import {DonationService} from './donation.service';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-donation',
@@ -12,11 +13,13 @@ export class DonationComponent implements OnInit {
   charities: Charity[];
   finishedLoading = false;
   charitiesLoaded = 0;
+  playerKey = '';
 
   charityIds = new Array<number>();
-  constructor(private donationService: DonationService) { }
+  constructor(private donationService: DonationService, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit(): void {
+
     this.charities = new Array<Charity>();
     // Can retrieve these from DB at a later time
     this.charityIds.push(13441, 2357, 255811, 2201, 182244, 233, 11200, 300);
@@ -25,6 +28,11 @@ export class DonationComponent implements OnInit {
         this.charities.push(response);
         this.charitiesLoaded++;
         this.finishedLoading = (this.charitiesLoaded === this.charityIds.length);
+        if (this.finishedLoading) {
+          this.activatedRoute.queryParams.subscribe(params => {
+            this.playerKey = params.key;
+          });
+        }
       });
     });
   }

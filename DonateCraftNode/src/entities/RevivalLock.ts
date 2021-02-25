@@ -1,4 +1,4 @@
-import {Entity, Column, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
 
 @Entity()
 export class RevivalLock {
@@ -10,9 +10,6 @@ export class RevivalLock {
     key!: string;
 
     @Column()
-    reference!: string;
-
-    @Column()
     unlockurl!: string;
 
     @Column()
@@ -20,7 +17,4 @@ export class RevivalLock {
 
     @Column()
     unlocked!: boolean;
-
-    @Column()
-    value!: number;
 }

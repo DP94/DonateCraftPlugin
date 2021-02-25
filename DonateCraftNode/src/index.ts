@@ -7,6 +7,7 @@ import cors from 'cors';
 import {DeathsDto} from "./dtos/deaths.dto";
 import path from "path";
 import http from 'http';
+import {RevivalsDto} from "./dtos/revivals.dto";
 
 const {v4: uuidv4} = require('uuid');
 const parseString = require('xml2js').parseString;
@@ -48,30 +49,6 @@ app.get('/', (request, response) => {
     response.sendFile(path.resolve(__dirname, 'build', 'index.html'));
 });
 
-// Death API
-
-app.post('/death', jsonParser, (request, res) => {
-    const data: Death = request.body.death;
-    connectToDB().then(async connection => {
-        try {
-            const deathRepository = connection.getRepository(Death);
-            let death: Death | undefined = await deathRepository.findOne({uuid: data.uuid})
-            if (death === undefined) {
-                death = new Death();
-                death.uuid = data.uuid;
-            }
-            death.name = data.name;
-            death.lastdeathreason = data.lastdeathreason;
-            death.deathcount++;
-            await connection.manager.save(death);
-        } catch (e) {
-            console.log(e);
-        } finally {
-            await connection.close();
-        }
-    }).catch(error => console.log(error));
-});
-
 app.get('/deaths', jsonParser, (request, response) => {
     connectToDB().then(async connection => {
         try {
@@ -98,7 +75,7 @@ function connectToDB() {
         password: DC_DB_PASSWORD,
         database: "donatecraft",
         entities: [
-            Death
+            Death, RevivalLock
         ],
         synchronize: true,
         logging: false
@@ -106,42 +83,37 @@ function connectToDB() {
 }
 
 // Revival API
-
 app.post('/lock', jsonParser, (request, response) => {
-    const key = request.body.key;
-    const charityId = request.body.charityId || 13441;
-    const value = request.body.donationValue || 2;
-    const currency = request.body.donationCurrency || "GBP";
-    const skipGiftAid = request.body.skipGiftAid || false;
-
-    // References can only be 8 characters. This should be sufficient as each
-    // donation id is unique and is used on the callback.
-    const reference = uuidv4().substring(0, 8);
-
-    const callbackURL = encodeURIComponent(DC_EXTERNAL_HOST + "/callback?jgDonationId=JUSTGIVING-DONATION-ID");
-
-    const url = "https://link.staging.justgiving.com/v1/charity/donate/charityId/" + charityId
-        + "?donationValue=" + value
-        + "&currency=" + currency
-        + "&reference=" + reference
-        + "&skipGiftAid=" + skipGiftAid
-        + "&exiturl=" + callbackURL;
-
+    const data: Death = request.body.death;
     // Register key into DB
     connectToDB().then(async connection => {
         try {
+            try {
+                const deathRepository = connection.getRepository(Death);
+                let death: Death | undefined = await deathRepository.findOne({uuid: data.uuid})
+                if (death === undefined) {
+                    death = new Death();
+                    death.uuid = data.uuid;
+                }
+                death.name = data.name;
+                death.lastdeathreason = data.lastdeathreason;
+                death.deathcount++;
+                await connection.manager.save(death);
+            } catch (e) {
+                console.log('Encountered issue when trying to persist user stats!');
+                console.log(e);
+            }
+
             const lockRepository = connection.getRepository(RevivalLock);
-            let lock: RevivalLock | undefined = await lockRepository.findOne({key: key})
+            let lock: RevivalLock | undefined = await lockRepository.findOne({key: data.uuid})
             if (lock === undefined) {
                 lock = new RevivalLock();
-                lock.key = key;
-                lock.reference = reference;
-                lock.unlockurl = url;
+                lock.key = data.uuid;
+                lock.unlockurl = '';
                 lock.donationid = -1;
                 lock.unlocked = false;
-                lock.value = value;
                 await connection.manager.save(lock);
-                response.send(url);
+                response.send('test');
             } else {
                 response.status(400).send('Lock already exists')
             }
@@ -196,46 +168,34 @@ function xmlToJson(url: string, callback: Function) {
     });
 }
 
-app.get('/unlocked/:key', jsonParser, (request, response) => {
-    const key = request.params.key;
+app.get('/unlocked', jsonParser, (request, response) => {
     connectToDB().then(async connection => {
         try {
             const lockRepository = connection.getRepository(RevivalLock);
-            let lock: RevivalLock | undefined = await lockRepository.findOne({key: key})
+            let lock: RevivalLock[] | undefined = await lockRepository.find({unlocked: true});
+            const revivals: RevivalsDto = new RevivalsDto();
+            revivals.revivals = lock;
+            response.setHeader('Content-Type', 'application/json');
+            response.end(JSON.stringify(revivals));
+        } catch (e) {
+            console.log(e);
+        } finally {
+            await connection.close();
+        }
+    }).catch(error => console.log(error));
+});
+
+app.post('/revived', jsonParser, (request, response) => {
+    const uuid = request.body.uuid;
+    connectToDB().then(async connection => {
+        try {
+            const lockRepository = connection.getRepository(RevivalLock);
+            let lock: RevivalLock | undefined = await lockRepository.findOne({key: uuid});
             if (lock === undefined) {
-                response.status(404).send('Lock not found for key: ' + key);
+                response.status(404).send("Player lock not found!");
             } else {
-                // If already unlocked quick return.
-                if (lock.unlocked) {
-                    await connection.close();
-                    response.send(lock.unlocked);
-                    return;
-                }
-
-                // Otherwise if the donation id is set check the JG API status
-                if (lock.donationid > 0) {
-                    const data = await util.promisify(xmlToJson)("http://api.staging.justgiving.com/" + DC_JG_API_KEY + "/v1/donation/" + lock.donationid);
-                    console.debug(JSON.stringify(data, null, 2));
-
-                    // If data is returned and we have a status
-                    if (data && data.donation.status && data.donation.status.length > 0) {
-                        const status = data.donation.status[0];
-                        // We can also unlock now that the donation is accepted and hits the minimum value to avoid future calls.
-                        if (status === "Accepted") {
-                            if (data.donation.amount[0] >= lock.value) {
-                                lock.unlocked = true;
-                                await connection.manager.save(lock);
-                                response.send(true);
-                            } else {
-                                console.error("User changed value at checkout to under required threshold. Deadlock.");
-                                response.send(false);
-                            }
-                        }
-                    }
-                }
+                await lockRepository.remove(lock);
             }
-            // Otherwise return false; we have yet to get a callback to identify donation id.
-            response.send(false);
         } catch (e) {
             console.log(e);
         } finally {
@@ -245,7 +205,18 @@ app.get('/unlocked/:key', jsonParser, (request, response) => {
 });
 
 app.get('/callback', jsonParser, (request, response) => {
-    const donationid = request.query.jgDonationId as string;
+    const data = request.query.data as string;
+    if (data === undefined || !data.includes("|")) {
+        response.status(404).send("Data from callback is not correct: " + data);
+        return;
+    }
+    const dataSplit = data.split("|");
+    if (dataSplit.length < 2) {
+        response.status(404).send("Not enough data found in callback: " + dataSplit);
+        return;
+    }
+    const donationid = dataSplit[0];
+    const key = dataSplit[1];
     if (!donationid) {
         response.status(404).send("No donation id found");
         return;
@@ -253,14 +224,14 @@ app.get('/callback', jsonParser, (request, response) => {
 
     connectToDB().then(async connection => {
         try {
-            const data = await util.promisify(xmlToJson)("http://api.staging.justgiving.com/" + DC_JG_API_KEY + "/v1/donation/" + donationid);
-            console.debug(JSON.stringify(data, null, 2));
+            const donationData = await util.promisify(xmlToJson)("http://api.staging.justgiving.com/" + DC_JG_API_KEY + "/v1/donation/" + donationid);
+            console.debug(JSON.stringify(donationData, null, 2));
 
             // If data is returned and we have a status
-            if (data && data.donation && data.donation.status && data.donation.status.length > 0) {
-                const reference = data.donation.thirdPartyReference;
+            if (donationData && donationData.donation && donationData.donation.status && donationData.donation.status.length > 0) {
+                const reference = donationData.donation.thirdPartyReference;
                 const lockRepository = connection.getRepository(RevivalLock);
-                let lock: RevivalLock | undefined = await lockRepository.findOne({reference: reference})
+                let lock: RevivalLock | undefined = await lockRepository.findOne({key: key})
                 if (lock === undefined) {
                     // We have a donation that we can't reference.
                     response.status(404).send("Cannot find associated lock for donation: " + donationid + " ref: " + reference);
@@ -269,15 +240,8 @@ app.get('/callback', jsonParser, (request, response) => {
                     lock.donationid = parseInt(donationid);
                 }
 
-                const status = data.donation.status[0];
-                // We can also unlock now that the donation is accepted and hits the minimum value to avoid future calls.
-                if (status === "Accepted") {
-                    if (data.donation.amount[0] >= lock.value) {
-                        lock.unlocked = true;
-                    } else {
-                        console.error("User changed value at checkout to under required threshold. Deadlock.");
-                    }
-                }
+                const status = donationData.donation.status[0];
+                lock.unlocked = true;
                 await connection.manager.save(lock);
                 response.redirect('/');
             }

@@ -1,5 +1,9 @@
 package com.vypersw.listeners;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -22,13 +26,18 @@ public class PlayerListener implements Listener {
         JSONObject deathObject = new JSONObject();
         deathObject.put("death", deathProperties);
 
+        final String deathURL = "http://changeme#donate?key=" + event.getEntity().getUniqueId().toString();
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8000/death"))
+                .uri(URI.create("http://changeme/lock"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(deathObject.toString()))
                 .build();
         HttpClient client = HttpClient.newBuilder().build();
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(HttpResponse::body);
+                .thenApply(HttpResponse::body).thenRun(() -> event.getEntity().spigot().sendMessage(new ComponentBuilder("You died! Please click this link to donate to a charity to buy back in!")
+                .event(new ClickEvent(ClickEvent.Action.OPEN_URL, deathURL))
+                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(deathURL).create()))
+                .create()));
     }
 }

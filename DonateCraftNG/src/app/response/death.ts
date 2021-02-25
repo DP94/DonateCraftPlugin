@@ -3,4 +3,5 @@ export class Death {
   uuid: string;
   id: number;
   name: string;
+  lastdeathreason: string;
 }

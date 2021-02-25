@@ -1,12 +1,18 @@
 <div class="content">
-<table *ngIf="deaths" class="table table-striped">
-  <tr>
-    <th>Player</th>
-    <th>Deaths</th>
-  </tr>
-  <tr *ngFor="let death of deaths" class="death-row">
-    <td><img src='https://crafatar.com/avatars/{{ death.uuid}}'/> {{ death.name }}</td>
-    <td>{{ death.deathcount }}</td>
-  </tr>
-</table>
+  <table *ngIf="deaths" class="table table-striped">
+    <thead>
+    <tr>
+      <th scope="col" class="death-table-header">Player</th>
+      <th scope="col" class="death-table-header">Last death reason</th>
+      <th scope="col" class="death-table-header">Deaths</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr scope="row" *ngFor="let death of deaths" class="death-row">
+      <td><img src='https://crafatar.com/avatars/{{ death.uuid}}'/> {{ death.name }}</td>
+      <td> {{ death.lastdeathreason }}</td>
+      <td>{{ death.deathcount }}</td>
+    </tr>
+    </tbody>
+  </table>
 </div>

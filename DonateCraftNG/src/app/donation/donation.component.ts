@@ -19,7 +19,7 @@ export class DonationComponent implements OnInit {
   ngOnInit(): void {
     this.charities = new Array<Charity>();
     // Can retrieve these from DB at a later time
-    this.charityIds.push(13441, 2357, 255811, 2201, 182244, 233);
+    this.charityIds.push(13441, 2357, 255811, 2201, 182244, 233, 11200, 300);
     this.charityIds.forEach((id) => {
       this.donationService.getCharityDetails(id).subscribe(response => {
         this.charities.push(response);

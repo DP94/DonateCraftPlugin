@@ -11,6 +11,6 @@ export class AppService {
   constructor(private http: HttpClient) {}
 
   getUserDeathStats(): Observable<DeathsResponse> {
-    return this.http.get<DeathsResponse>('http://86.168.247.27:8000/deaths');
+    return this.http.get<DeathsResponse>('http://changeme/deaths');
   }
 }

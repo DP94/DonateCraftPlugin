@@ -7,16 +7,18 @@ import org.bukkit.entity.Player;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.UUID;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class ReanimationProtocol implements Runnable {
 
     private Server server;
+    private BlockingQueue<UUID> toRevive = new LinkedBlockingQueue<>();
 
     public ReanimationProtocol(Server server) {
         this.server = server;
@@ -35,9 +37,18 @@ public class ReanimationProtocol implements Runnable {
             JSONArray array = object.getJSONArray("revivals");
             for (int i = 0; i < array.length(); i++) {
                 JSONObject player = array.getJSONObject(i);
-                reanimatePlayer(player);
+                String uuid = player.getString("key");
+                toRevive.offer(UUID.fromString(uuid));
             }
         });
+
+        Set<UUID> uuids = new HashSet<>();
+        toRevive.drainTo(uuids);
+        for (UUID uuid : uuids) {
+            if (!reanimatePlayer(uuid)) {
+                toRevive.offer(uuid);
+            }
+        }
     }
 
     private HttpRequest getReanimationListRequest() {
@@ -48,19 +59,21 @@ public class ReanimationProtocol implements Runnable {
                 .build();
     }
 
-    private void reanimatePlayer(JSONObject jsonObject) {
-        String uuid = jsonObject.getString("key");
-        Player player = Bukkit.getPlayer(UUID.fromString(uuid));
+    private boolean reanimatePlayer(UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
         if (player != null && player.isOnline()) {
             server.broadcastMessage("Revived " + player.getName());
             player.setGameMode(GameMode.SURVIVAL);
             fireRevivedRequest(uuid);
+            return true;
         }
+
+        return false;
     }
 
-    private void fireRevivedRequest(String uuid) {
+    private void fireRevivedRequest(UUID uuid) {
         JSONObject deathObject = new JSONObject();
-        deathObject.put("uuid", uuid);
+        deathObject.put("uuid", uuid.toString());
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("http://changeme/revived"))

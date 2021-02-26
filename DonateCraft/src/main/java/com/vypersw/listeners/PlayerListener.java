@@ -26,10 +26,10 @@ public class PlayerListener implements Listener {
         JSONObject deathObject = new JSONObject();
         deathObject.put("death", deathProperties);
 
-        final String deathURL = "http://changeme#donate?key=" + event.getEntity().getUniqueId().toString();
+        final String deathURL = "http://localhost:8000#donate?key=" + event.getEntity().getUniqueId().toString();
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://changeme/lock"))
+                .uri(URI.create("http://localhost:8000/lock"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(deathObject.toString()))
                 .build();

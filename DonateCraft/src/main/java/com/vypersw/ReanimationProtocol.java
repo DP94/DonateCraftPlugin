@@ -19,15 +19,18 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class ReanimationProtocol implements Runnable {
 
-    private Server server;
+    private final Server server;
+    private final String serverURL;
     private BlockingQueue<UUID> toRevive = new LinkedBlockingQueue<>();
 
-    public ReanimationProtocol(Server server) {
+    public ReanimationProtocol(Server server, String serverURL) {
         this.server = server;
+        this.serverURL = serverURL;
     }
 
     @Override
     public void run() {
+        Bukkit.getLogger().info("Running reanimation protocol");
         reanimateEligiblePlayers();
     }
 
@@ -37,12 +40,20 @@ public class ReanimationProtocol implements Runnable {
         HttpClient client = HttpClient.newBuilder().build();
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenAccept(asyncResponse -> {
             JSONObject object = new JSONObject(asyncResponse.body());
-            JSONArray array = object.getJSONArray("revivals");
-            for (int i = 0; i < array.length(); i++) {
-                JSONObject player = array.getJSONObject(i);
-                String uuid = player.getString("key");
-                System.out.println("Received UUID which is eligible to be revived! " + uuid);
-                toRevive.offer(UUID.fromString(uuid));
+            if (object.has("revivals")) {
+                JSONArray array = object.getJSONArray("revivals");
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject player = array.getJSONObject(i);
+                    if (player.has("key")) {
+                        String uuid = player.getString("key");
+                        Bukkit.getLogger().info("Received UUID which is eligible to be revived! " + uuid);
+                        toRevive.offer(UUID.fromString(uuid));
+                    } else {
+                        Bukkit.getLogger().warning("Could not find player object in revivals JSON response - has the server response changed?");
+                    }
+                }
+            } else {
+                Bukkit.getLogger().warning("Could not find revivals array in JSON response - has the server response changed?");
             }
         });
 
@@ -55,7 +66,7 @@ public class ReanimationProtocol implements Runnable {
 
     private HttpRequest getReanimationListRequest() {
         return HttpRequest.newBuilder()
-                .uri(URI.create("http://86.168.247.27:8000/unlocked"))
+                .uri(URI.create(serverURL + "/unlocked"))
                 .header("Content-Type", "application/json")
                 .GET()
                 .build();
@@ -63,10 +74,9 @@ public class ReanimationProtocol implements Runnable {
 
     private void reanimatePlayer(UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
-        System.out.println("In reanimate player: " + uuid.toString());
         //Extra checks just in case Minecraft has pinged the server again before our async call has come back
         if (player != null && player.isOnline() && (player.isDead() || player.getGameMode() == GameMode.SPECTATOR)) {
-            System.out.println("Attempting to revive " + player.getName());
+            Bukkit.getLogger().info("Attempting to revive " + player.getName());
             server.broadcastMessage("Revived " + player.getName());
             player.setGameMode(GameMode.SURVIVAL);
             fireRevivedRequest(uuid);
@@ -78,7 +88,7 @@ public class ReanimationProtocol implements Runnable {
         deathObject.put("uuid", uuid.toString());
         System.out.println("Firing revived request");
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8000/revived"))
+                .uri(URI.create(serverURL + "/revived"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(deathObject.toString()))
                 .build();

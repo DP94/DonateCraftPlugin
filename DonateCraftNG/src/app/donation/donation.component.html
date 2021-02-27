@@ -2,17 +2,21 @@
   <table class="table table-striped h-100">
     <tbody class="h-100">
     <tr *ngFor="let charity of charities" class="charity-row h-100">
-    <td class="h-100 charity-image-td">
-      <div class="charity-image h-100">
-          <img src="{{charity.logoAbsoluteUrl}}" class="charity-image" alt="Could not load image, has the charity set one?"/>
-      </div>
-    <td>
-      <div class="charity-info-wrapper">
-        <span class="charity-info charity-name">{{ charity.name }}</span>
-        <span class="charity-info charity-description"> {{ charity.description }}</span>
-        <a href="https://link.staging.justgiving.com/v1/charity/donate/charityId/{{charity.id}}?exiturl=http://localhost:8000/callback?data=JUSTGIVING-DONATION-ID|{{playerKey}}"><button class="btn btn-success charity-donate charity-info">Donate</button></a>
-      </div>
-    </td>
+      <td class="h-100 charity-image-td">
+        <div class="charity-image h-100">
+          <img src="{{charity.logoAbsoluteUrl}}" class="charity-image"
+               alt="Could not load image, has the charity set one?"/>
+        </div>
+      <td>
+        <div class="charity-info-wrapper">
+          <span class="charity-info charity-name">{{ charity.name }}</span>
+          <span class="charity-info charity-description"> {{ charity.description }}</span>
+          <a
+            href="{{directiveEnv.justGivingDonateUrl}}{{charity.id}}?exiturl={{directiveEnv.apiUrl}}callback?data=JUSTGIVING-DONATION-ID|{{playerKey}}">
+            <button class="btn btn-success charity-donate charity-info">Donate</button>
+          </a>
+        </div>
+      </td>
     </tr>
     </tbody>
   </table>

@@ -16,6 +16,13 @@ import java.net.http.HttpResponse;
 
 public class PlayerListener implements Listener {
 
+    private final String serverURL;
+
+    public PlayerListener(String serverURL) {
+        this.serverURL = serverURL;
+    }
+
+
     @EventHandler
     void onPlayerDeath(PlayerDeathEvent event) {
 
@@ -26,10 +33,10 @@ public class PlayerListener implements Listener {
         JSONObject deathObject = new JSONObject();
         deathObject.put("death", deathProperties);
 
-        final String deathURL = "http://localhost:8000#donate?key=" + event.getEntity().getUniqueId().toString();
+        final String deathURL = serverURL + "#donate?key=" + event.getEntity().getUniqueId().toString();
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:8000/lock"))
+                .uri(URI.create(serverURL + "/lock"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(deathObject.toString()))
                 .build();

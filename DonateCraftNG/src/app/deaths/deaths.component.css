@@ -5,3 +5,14 @@
 .death-table-header {
   text-align: center;
 }
+
+.last-death-reason {
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.centre-text {
+  display: flex;
+  align-items: center;
+}

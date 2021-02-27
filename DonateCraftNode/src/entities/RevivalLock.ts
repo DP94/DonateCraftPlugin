@@ -1,4 +1,5 @@
-import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {Donation} from "./donation";
 
 @Entity()
 export class RevivalLock {
@@ -12,8 +13,8 @@ export class RevivalLock {
     @Column()
     unlockurl!: string;
 
-    @Column()
-    donationid!: number;
+    @OneToOne(type => Donation) @JoinColumn()
+    donation?: Donation;
 
     @Column()
     unlocked!: boolean;

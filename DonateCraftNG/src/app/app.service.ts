@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {DeathsResponse} from './response/deaths.response';
+import {PlayerResponse} from './response/player.response';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,7 @@ export class AppService {
 
   constructor(private http: HttpClient) {}
 
-  getUserDeathStats(): Observable<DeathsResponse> {
-    return this.http.get<DeathsResponse>('http://changeme/deaths');
+  getPlayerStats(): Observable<PlayerResponse> {
+    return this.http.get<PlayerResponse>('http://localhost:8000/players');
   }
 }

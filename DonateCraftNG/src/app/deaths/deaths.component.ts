@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import {Death} from '../response/death';
+import {AfterContentChecked, Component, OnInit} from '@angular/core';
+import {Player} from '../response/player';
 import {AppService} from '../app.service';
+import {Donation} from '../response/donation';
 
 @Component({
   selector: 'app-deaths',
@@ -9,15 +10,22 @@ import {AppService} from '../app.service';
 })
 export class DeathsComponent implements OnInit {
 
-  deaths: Death[];
+  deaths: Player[];
 
   constructor(private appService: AppService) {
   }
 
   ngOnInit(): void {
-    this.appService.getUserDeathStats().subscribe(response => {
-      this.deaths = response.deaths;
+    this.appService.getPlayerStats().subscribe(response => {
+      this.deaths = response.players;
     });
   }
 
+  getTotalDonationsForPlayer(donations: Donation[]): number {
+    let total = 0;
+    for (const donation of donations) {
+      total += donation.amount;
+    }
+    return total;
+  }
 }

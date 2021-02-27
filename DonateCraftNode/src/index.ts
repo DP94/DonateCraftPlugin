@@ -1,13 +1,14 @@
 import express from 'express';
 import {createConnection} from 'typeorm';
-import {Death} from './entities/Death';
+import {Player} from './entities/player';
 import {RevivalLock} from './entities/RevivalLock';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import {DeathsDto} from "./dtos/deaths.dto";
+import {PlayersDto} from "./dtos/players.dto";
 import path from "path";
 import http from 'http';
 import {RevivalsDto} from "./dtos/revivals.dto";
+import {Donation} from "./entities/donation";
 
 const {v4: uuidv4} = require('uuid');
 const parseString = require('xml2js').parseString;
@@ -49,15 +50,15 @@ app.get('/', (request, response) => {
     response.sendFile(path.resolve(__dirname, 'build', 'index.html'));
 });
 
-app.get('/deaths', jsonParser, (request, response) => {
+app.get('/players', jsonParser, (request, response) => {
     connectToDB().then(async connection => {
         try {
-            const deathRepository = connection.getRepository(Death);
-            const deaths: Death[] = await deathRepository.find({order: {deathcount: "DESC", lastdeathreason: "DESC"}});
-            const deathDTO: DeathsDto = new DeathsDto();
-            deathDTO.deaths = deaths;
+            const deathRepository = connection.getRepository(Player);
+            const players: Player[] = await deathRepository.find({order: {deathcount: "DESC", lastdeathreason: "DESC"}});
+            const playersDTO: PlayersDto = new PlayersDto();
+            playersDTO.players = players;
             response.setHeader('Content-Type', 'application/json');
-            response.end(JSON.stringify(deathDTO));
+            response.end(JSON.stringify(playersDTO));
         } catch (e) {
             console.log(e);
         } finally {
@@ -75,7 +76,7 @@ function connectToDB() {
         password: DC_DB_PASSWORD,
         database: "donatecraft",
         entities: [
-            Death, RevivalLock
+            Player, RevivalLock, Donation
         ],
         synchronize: true,
         logging: false
@@ -84,15 +85,15 @@ function connectToDB() {
 
 // Revival API
 app.post('/lock', jsonParser, (request, response) => {
-    const data: Death = request.body.death;
+    const data: Player = request.body.death;
     // Register key into DB
     connectToDB().then(async connection => {
         try {
             try {
-                const deathRepository = connection.getRepository(Death);
-                let death: Death | undefined = await deathRepository.findOne({uuid: data.uuid})
+                const deathRepository = connection.getRepository(Player);
+                let death: Player | undefined = await deathRepository.findOne({uuid: data.uuid})
                 if (death === undefined) {
-                    death = new Death();
+                    death = new Player();
                     death.uuid = data.uuid;
                 }
                 death.name = data.name;
@@ -110,7 +111,6 @@ app.post('/lock', jsonParser, (request, response) => {
                 lock = new RevivalLock();
                 lock.key = data.uuid;
                 lock.unlockurl = '';
-                lock.donationid = -1;
                 lock.unlocked = false;
                 await connection.manager.save(lock);
                 response.send('test');
@@ -193,7 +193,7 @@ app.post('/revived', jsonParser, (request, response) => {
             let lock: RevivalLock | undefined = await lockRepository.findOne({key: uuid});
             if (lock === undefined) {
                 response.status(404).send("Player lock not found!");
-            } else {
+            } else if (lock.unlocked) {
                 await lockRepository.remove(lock);
             }
         } catch (e) {
@@ -204,7 +204,7 @@ app.post('/revived', jsonParser, (request, response) => {
     }).catch(error => console.log(error));
 });
 
-app.get('/callback', jsonParser, (request, response) => {
+app.get('/callback', jsonParser, async (request, response) => {
     const data = request.query.data as string;
     if (data === undefined || !data.includes("|")) {
         response.status(404).send("Data from callback is not correct: " + data);
@@ -221,34 +221,48 @@ app.get('/callback', jsonParser, (request, response) => {
         response.status(404).send("No donation id found");
         return;
     }
+    const donationData = await util.promisify(xmlToJson)("http://api.staging.justgiving.com/" + DC_JG_API_KEY + "/v1/donation/" + donationid);
+    if (donationData && donationData.donation && donationData.donation.status && donationData.donation.status.length > 0) {
+        connectToDB().then(async connection => {
+            try {
+                // If data is returned and we have a status
+                if (data && donationData.donation.status && donationData.donation.status.length > 0) {
+                    const status = donationData.donation.status[0];
+                    // We can also unlock now that the donation is accepted and hits the minimum value to avoid future calls.
+                    if (status === "Accepted") {
+                        const reference = donationData.donation.thirdPartyReference;
+                        const lockRepository = connection.getRepository(RevivalLock);
+                        let lock: RevivalLock | undefined = await lockRepository.findOne({key: key})
+                        if (lock === undefined) {
+                            // We have a donation that we can't reference.
+                            response.status(404).send("Cannot find associated lock for donation: " + donationid + " ref: " + reference);
+                            return;
+                        } else {
+                            const donationRepository = connection.getRepository(Donation);
+                            const donation = new Donation();
+                            donation.donationId = parseInt(donationid);
+                            donation.amount = donationData.donation.amount;
+                            donation.charity = donationData.donation.charityId;
+                            donation.uuid = key;
+                            donation.date = new Date();
 
-    connectToDB().then(async connection => {
-        try {
-            const donationData = await util.promisify(xmlToJson)("http://api.staging.justgiving.com/" + DC_JG_API_KEY + "/v1/donation/" + donationid);
-            console.debug(JSON.stringify(donationData, null, 2));
-
-            // If data is returned and we have a status
-            if (donationData && donationData.donation && donationData.donation.status && donationData.donation.status.length > 0) {
-                const reference = donationData.donation.thirdPartyReference;
-                const lockRepository = connection.getRepository(RevivalLock);
-                let lock: RevivalLock | undefined = await lockRepository.findOne({key: key})
-                if (lock === undefined) {
-                    // We have a donation that we can't reference.
-                    response.status(404).send("Cannot find associated lock for donation: " + donationid + " ref: " + reference);
-                    return;
-                } else {
-                    lock.donationid = parseInt(donationid);
+                            await donationRepository.save(donation);
+                            lock.donation = donation;
+                        }
+                        lock.unlocked = true;
+                        await connection.manager.save(lock);
+                        response.redirect('/');
+                    } else if (status === "Pending") {
+                        response.sendStatus(200);
+                    } else if (status === "Failed") {
+                        response.sendStatus(500);
+                    }
                 }
-
-                const status = donationData.donation.status[0];
-                lock.unlocked = true;
-                await connection.manager.save(lock);
-                response.redirect('/');
+            } catch (e) {
+                console.log(e);
+            } finally {
+                await connection.close();
             }
-        } catch (e) {
-            console.log(e);
-        } finally {
-            await connection.close();
-        }
-    }).catch(error => console.log(error));
+        }).catch(error => console.log(error));
+    }
 });

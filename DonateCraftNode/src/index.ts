@@ -1,5 +1,5 @@
 import express from 'express';
-import {createConnection, getConnectionManager} from 'typeorm';
+import {createConnection, getManager} from 'typeorm';
 import {Player} from './entities/player';
 import {RevivalLock} from './entities/RevivalLock';
 import bodyParser from 'body-parser';
@@ -36,7 +36,7 @@ const app = express();
 const PORT = 8000;
 const jsonParser = bodyParser.json();
 
-connectToDB().then(async connection => {
+connectToDB().then(async () => {
     app.use(cors());
     app.use(express.static(process.cwd() + "/build/public/"));
     app.listen(PORT, () => {
@@ -49,7 +49,7 @@ connectToDB().then(async connection => {
 
     app.get('/players', jsonParser, async (request, response) => {
         try {
-            const deathRepository = connection.getRepository(Player);
+            const deathRepository = getManager().getRepository(Player);
             const players: Player[] = await deathRepository.find({
                 order: {
                     deathcount: "DESC",
@@ -70,7 +70,7 @@ connectToDB().then(async connection => {
         // Register key into DB
         try {
             try {
-                const deathRepository = connection.getRepository(Player);
+                const deathRepository = getManager().getRepository(Player);
                 let death: Player | undefined = await deathRepository.findOne({uuid: data.uuid})
                 if (death === undefined) {
                     death = new Player();
@@ -79,20 +79,20 @@ connectToDB().then(async connection => {
                 death.name = data.name;
                 death.lastdeathreason = data.lastdeathreason;
                 death.deathcount++;
-                await connection.manager.save(death);
+                await getManager().save(death);
             } catch (e) {
                 console.log('Encountered issue when trying to persist user stats!');
                 console.log(e);
             }
 
-            const lockRepository = connection.getRepository(RevivalLock);
+            const lockRepository = getManager().getRepository(RevivalLock);
             let lock: RevivalLock | undefined = await lockRepository.findOne({key: data.uuid})
             if (lock === undefined) {
                 lock = new RevivalLock();
                 lock.key = data.uuid;
                 lock.unlockurl = '';
                 lock.unlocked = false;
-                await connection.manager.save(lock);
+                await getManager().save(lock);
                 response.send('test');
             } else {
                 response.status(400).send('Lock already exists')
@@ -105,7 +105,7 @@ connectToDB().then(async connection => {
     app.get('/unlockURL/:key', jsonParser, async (request, response) => {
         const key = request.params.key;
         try {
-            const lockRepository = connection.getRepository(RevivalLock);
+            const lockRepository = getManager().getRepository(RevivalLock);
             let lock: RevivalLock | undefined = await lockRepository.findOne({key: key});
             if (lock === undefined) {
                 response.status(404).send('Lock not found for key: ' + key);
@@ -119,7 +119,7 @@ connectToDB().then(async connection => {
 
     app.get('/unlocked', jsonParser, async (request, response) => {
         try {
-            const lockRepository = connection.getRepository(RevivalLock);
+            const lockRepository = getManager().getRepository(RevivalLock);
             let lock: RevivalLock[] | undefined = await lockRepository.find({unlocked: true});
             const revivals: RevivalsDto = new RevivalsDto();
             revivals.revivals = lock;
@@ -133,7 +133,7 @@ connectToDB().then(async connection => {
     app.post('/revived', jsonParser, async (request, response) => {
         const uuid = request.body.uuid;
         try {
-            const lockRepository = connection.getRepository(RevivalLock);
+            const lockRepository = getManager().getRepository(RevivalLock);
             let lock: RevivalLock | undefined = await lockRepository.findOne({key: uuid});
             if (lock === undefined) {
                 response.status(404).send("Player lock not found!");
@@ -171,14 +171,14 @@ connectToDB().then(async connection => {
                     // We can also unlock now that the donation is accepted and hits the minimum value to avoid future calls.
                     if (status === "Accepted" || status === "Pending") {
                         const reference = donationData.donation.thirdPartyReference;
-                        const lockRepository = connection.getRepository(RevivalLock);
+                        const lockRepository = getManager().getRepository(RevivalLock);
                         let lock: RevivalLock | undefined = await lockRepository.findOne({key: key})
                         if (lock === undefined) {
                             // We have a donation that we can't reference.
                             response.status(404).send("Cannot find associated lock for donation: " + donationid + " ref: " + reference);
                             return;
                         } else if (!lock.unlocked) {
-                            const donationRepository = connection.getRepository(Donation);
+                            const donationRepository = getManager().getRepository(Donation);
                             const donation = new Donation();
                             donation.donationId = parseInt(donationid);
                             donation.amount = donationData.donation.amount;
@@ -189,7 +189,7 @@ connectToDB().then(async connection => {
                             await donationRepository.save(donation);
                             lock.donation = donation;
                             lock.unlocked = true;
-                            await connection.manager.save(lock);
+                            await getManager().save(lock);
                         }
                         response.redirect('/#/?status=success');
                     } else if (status === "Failed") {

@@ -1,5 +1,5 @@
-<div>
-  <table *ngIf="deaths" class="table table-striped h-100">
+<div class="table-responsive">
+  <table *ngIf="deaths" class="table table-striped table-bordered table-hover h-100">
     <thead>
     <tr>
       <th scope="col" class="death-table-header">Player</th>
@@ -10,10 +10,10 @@
     </thead>
     <tbody class="h-100">
     <tr scope="row" *ngFor="let death of deaths" class="death-row h-100">
-      <td class="h-100"><img src='https://crafatar.com/avatars/{{ death.uuid}}'/> {{ death.name }}</td>
+      <td class="h-100"><img src='https://crafatar.com/avatars/{{ death.uuid}}'/><span> {{ death.name }}</span></td>
       <td class="last-death-reason h-100"><span>{{ death.lastdeathreason }}</span></td>
-      <td class="h-100"><span>{{ death.deathcount }}</span></td>
-      <td class="h-100"><span>£{{ getTotalDonationsForPlayer(death.donations)}}</span></td>
+      <td class="h-100 death-count"><span>{{ death.deathcount }}</span></td>
+      <td class="h-100 donation-count"><span>£{{ getTotalDonationsForPlayer(death.donations)}}</span></td>
     </tr>
     </tbody>
   </table>

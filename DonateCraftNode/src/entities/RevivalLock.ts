@@ -13,7 +13,9 @@ export class RevivalLock {
     @Column()
     unlockurl!: string;
 
-    @OneToOne(type => Donation) @JoinColumn()
+    @OneToOne(type => Donation, {
+        cascade: true,
+    }) @JoinColumn()
     donation?: Donation;
 
     @Column()

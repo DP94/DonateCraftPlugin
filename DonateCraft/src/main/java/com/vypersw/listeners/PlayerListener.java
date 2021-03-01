@@ -1,18 +1,14 @@
 package com.vypersw.listeners;
 
+import com.vypersw.network.HttpHelper;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.json.JSONObject;
-
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 
 public class PlayerListener implements Listener {
 
@@ -34,17 +30,14 @@ public class PlayerListener implements Listener {
         deathObject.put("death", deathProperties);
 
         final String deathURL = serverURL + "#donate?key=" + event.getEntity().getUniqueId().toString();
+        HttpHelper httpHelper = new HttpHelper(serverURL);
+        httpHelper.fireAsyncPostRequestToServer("/lock", deathObject, () -> sendDeathURL(event.getEntity(), deathURL));
+    }
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(serverURL + "/lock"))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(deathObject.toString()))
-                .build();
-        HttpClient client = HttpClient.newBuilder().build();
-        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(HttpResponse::body).thenRun(() -> event.getEntity().spigot().sendMessage(new ComponentBuilder("You died! Please click this link to donate to a charity to buy back in!")
+    private void sendDeathURL(Player player, String deathURL) {
+        player.spigot().sendMessage(new ComponentBuilder("You died! Please click this link to donate to a charity to buy back in!")
                 .event(new ClickEvent(ClickEvent.Action.OPEN_URL, deathURL))
                 .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(deathURL).create()))
-                .create()));
+                .create());
     }
 }

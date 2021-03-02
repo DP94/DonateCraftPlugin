@@ -16,7 +16,7 @@ public class Donation {
     }
 
     public void setId(long id) {
-        this.id = id;fail
+        this.id = id;
     }
 
     public long getDonationId() {

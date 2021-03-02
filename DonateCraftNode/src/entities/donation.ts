@@ -10,7 +10,7 @@ export class Donation {
     @Column()
     donationId!: number;
 
-    @Column({type: "decimal", precision: 15, scale: 2})
+    @Column({type: "decimal", precision: 15, scale: 2, nullable: true})
     amount!: number;
 
     @ManyToOne(() => Player, player => player.donations)

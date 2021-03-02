@@ -10,16 +10,12 @@ import http from 'http';
 import {RevivalsDto} from "./dtos/revivals.dto";
 import {Donation} from "./entities/donation";
 
-const {v4: uuidv4} = require('uuid');
-const parseString = require('xml2js').parseString;
-
 const util = require('util')
 require('dotenv').config()
 
 const DC_DB_USERNAME = process.env.DC_DB_USERNAME;
 const DC_DB_PASSWORD = process.env.DC_DB_PASSWORD;
 const DC_JG_API_KEY = process.env.DC_JG_API_KEY;
-const DC_EXTERNAL_HOST = process.env.DC_EXTERNAL_HOST;
 if (!DC_DB_USERNAME) {
     console.error("DC_DB_USERNAME not set");
     process.exit(-1);
@@ -146,42 +142,48 @@ connectToDB().then(async () => {
             response.status(404).send("No donation id found");
             return;
         }
-        const donationData = await util.promisify(xmlToJson)(`http://api.staging.justgiving.com/${DC_JG_API_KEY}/v1/donation/${donationid}`);
-        if (donationData && donationData.donation && donationData.donation.status && donationData.donation.status.length > 0) {
+        const donationData = await util.promisify(fireGetJSONRequest)(`api.staging.justgiving.com`, `/${DC_JG_API_KEY}/v1/donation/${donationid}`);
+        if (donationData && donationData.status && donationData.status.length > 0) {
             try {
                 // If data is returned and we have a status
-                if (data && donationData.donation.status && donationData.donation.status.length > 0) {
-                    const status = donationData.donation.status[0];
+                if (data && donationData.status && donationData.status.length > 0) {
+                    const status = donationData.status;
                     // We can also unlock now that the donation is accepted and hits the minimum value to avoid future calls.
                     if (status === "Accepted" || status === "Pending") {
-                        const reference = donationData.donation.thirdPartyReference;
+                        const reference = donationData.thirdPartyReference;
                         const lockRepository = getManager().getRepository(RevivalLock);
                         let lock: RevivalLock | undefined = await lockRepository.findOne({key: key})
                         if (lock === undefined) {
                             // We have a donation that we can't reference.
-                            response.status(404).send("Cannot find associated lock for donation: " + donationid + " ref: " + reference);
+                            console.log(`Cannot find associated lock for donation: ${donationid} key: ${key}`);
+                            response.redirect('/#/?status=error');
                             return;
                         } else if (!lock.unlocked) {
                             const donationRepository = getManager().getRepository(Donation);
                             const donation = new Donation();
                             donation.donationId = parseInt(donationid);
-                            donation.amount = donationData.donation.amount;
-                            donation.charity = donationData.donation.charityId;
+                            donation.amount = donationData.amount;
+                            donation.charity = donationData.charityId;
                             donation.uuid = key;
 
-                            const charityData = await util.promisify(xmlToJson)("http://api.staging.justgiving.com/" + DC_JG_API_KEY + "/v1/charity/" + donation.charity);
-                            donation.charityName = charityData.charity.name;
+                            const charityData = await util.promisify(fireGetJSONRequest)('api.staging.justgiving.com', `/${DC_JG_API_KEY}/v1/charity/${donation.charity}`);
+                            donation.charityName = charityData.name;
                             donation.date = new Date();
 
                             await donationRepository.save(donation);
                             lock.donation = donation;
                             lock.unlocked = true;
                             await getManager().save(lock);
+                            response.redirect('/#/?status=success');
+                            return;
+                        } else {
+                            response.redirect('/#/?status=success');
+                            return;
                         }
-                        response.redirect('/#/?status=success');
                     } else if (status === "Failed" || status === "Cancelled") {
                         response.sendStatus(500);
                         response.redirect('/#/?status=error');
+                        return;
                     }
                 }
             } catch (e) {
@@ -191,12 +193,19 @@ connectToDB().then(async () => {
     })
 }).then((error) => console.log(error));
 
-function xmlToJson(url: string, callback: Function) {
-    const req = http.get(url, (res: http.IncomingMessage) => {
-        let xml = '';
+function fireGetJSONRequest(host: string, path: string, callback: Function) {
+    const options = {
+        host: host,
+        path: path,
+        headers: {'Content-Type': 'application/json'},
+        method: 'GET',
+    }
+    console.log(`Firing request to ${host}${path}`);
+    http.get(options, (res: http.IncomingMessage) => {
+        let json = '';
 
         res.on('data', function (chunk: string) {
-            xml += chunk;
+            json += chunk;
         });
 
         res.on('error', function (e: string) {
@@ -208,9 +217,8 @@ function xmlToJson(url: string, callback: Function) {
         });
 
         res.on('end', function () {
-            parseString(xml, function (err: string, result: string) {
-                callback(null, result);
-            });
+            json = JSON.parse(json);
+            callback(null, json);
         });
     });
 }

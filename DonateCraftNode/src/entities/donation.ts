@@ -10,7 +10,7 @@ export class Donation {
     @Column()
     donationId!: number;
 
-    @Column()
+    @Column({type: "decimal", precision: 15, scale: 2})
     amount!: number;
 
     @ManyToOne(() => Player, player => player.donations)
@@ -21,4 +21,8 @@ export class Donation {
 
     @Column()
     charity!: number;
+
+    @Column()
+        //Here so Minecraft plugin can show this without a second request
+    charityName?: string;
 }

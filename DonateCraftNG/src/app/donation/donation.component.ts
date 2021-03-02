@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Charity} from '../response/charity';
 import {DonationService} from './donation.service';
 import {ActivatedRoute} from '@angular/router';
-import { environment } from '../../environments/environment';
+import {environment} from '../../environments/environment';
 
 @Component({
   selector: 'app-donation',
@@ -18,7 +18,9 @@ export class DonationComponent implements OnInit {
   directiveEnv = environment;
 
   charityIds = new Array<number>();
-  constructor(private donationService: DonationService, private activatedRoute: ActivatedRoute) { }
+
+  constructor(private donationService: DonationService, private activatedRoute: ActivatedRoute) {
+  }
 
   ngOnInit(): void {
 
@@ -37,6 +39,12 @@ export class DonationComponent implements OnInit {
         }
       });
     });
+  }
+
+  onJGClick(charity: Charity): void {
+    window.open(environment.justGivingDonateUrl + charity.id + '?exiturl=' + environment.fullAPIUrl
+                                                    + 'callback?data=JUSTGIVING-DONATION-ID|'
+                                                    + this.playerKey, '_blank');
   }
 
 }

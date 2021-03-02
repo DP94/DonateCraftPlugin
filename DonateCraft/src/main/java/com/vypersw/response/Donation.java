@@ -5,21 +5,26 @@ import java.util.Date;
 public class Donation {
 
     private long id;
-    private long donationId;
-    private double amount;
+    private Long donationId;
+    private Double amount;
     private Date date;
     private long charity;
     private String charityName;
+    private boolean isPrivate;
 
     public long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public boolean isPrivate() {
+        return amount == null && donationId != null;
+    }
+
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public long getDonationId() {
+    public Long getDonationId() {
         return donationId;
     }
 
@@ -27,11 +32,11 @@ public class Donation {
         this.donationId = donationId;
     }
 
-    public double getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 

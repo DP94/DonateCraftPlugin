@@ -22,6 +22,7 @@ public class ReanimationProtocol implements Runnable {
     private final String serverURL;
     private BlockingQueue<UUID> toRevive = new LinkedBlockingQueue<>();
     private final HttpHelper httpHelper;
+    private final MessageHelper messageHelper = new MessageHelper();
 
     public ReanimationProtocol(Server server, String serverURL) {
         this.server = server;
@@ -46,10 +47,7 @@ public class ReanimationProtocol implements Runnable {
                         UUID uuid = UUID.fromString(revival.getKey());
                         Player player = server.getPlayer(uuid);
                         if (player != null && player.getGameMode() == GameMode.SPECTATOR) {
-                            Bukkit.broadcastMessage(ChatColor.GOLD + player.getName() + ChatColor.WHITE + " just donated"
-                                    + ChatColor.GREEN + " £" + revival.getDonation().getAmount() + ChatColor.WHITE + " to "
-                                    + ChatColor.GOLD + revival.getDonation().getCharityName() + ChatColor.WHITE
-                                    +"! They will be revived shortly (if they are online)");
+                            Bukkit.broadcastMessage(messageHelper.getDonationMessageFromRevival(player, revival));
                             toRevive.offer(uuid);
                         }
                     }

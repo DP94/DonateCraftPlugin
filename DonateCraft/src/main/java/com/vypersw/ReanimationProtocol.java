@@ -1,11 +1,10 @@
 package com.vypersw;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vypersw.network.HttpHelper;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Server;
+import com.vypersw.response.Revival;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.net.http.HttpClient;
@@ -39,21 +38,24 @@ public class ReanimationProtocol implements Runnable {
         HttpRequest request = httpHelper.buildGETHttpRequest("/unlocked");
         HttpClient client = HttpClient.newBuilder().build();
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenAccept(asyncResponse -> {
-            JSONObject object = new JSONObject(asyncResponse.body());
-            if (object.has("revivals")) {
-                JSONArray array = object.getJSONArray("revivals");
-                for (int i = 0; i < array.length(); i++) {
-                    JSONObject player = array.getJSONObject(i);
-                    if (player.has("key")) {
-                        String uuid = player.getString("key");
-                        Bukkit.getLogger().info("Received UUID which is eligible to be revived! " + uuid);
-                        toRevive.offer(UUID.fromString(uuid));
-                    } else {
-                        Bukkit.getLogger().warning("Could not find player object in revivals JSON response - has the server response changed?");
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                RevivalResponse response = objectMapper.readerFor(RevivalResponse.class).readValue(asyncResponse.body());
+                if (response.getRevivals() != null && !response.getRevivals().isEmpty()) {
+                    for (Revival revival : response.getRevivals()) {
+                        UUID uuid = UUID.fromString(revival.getKey());
+                        Player player = server.getPlayer(uuid);
+                        if (player != null && player.getGameMode() == GameMode.SPECTATOR) {
+                            Bukkit.broadcastMessage(ChatColor.GOLD + player.getName() + ChatColor.WHITE + " just donated"
+                                    + ChatColor.GREEN + " £" + revival.getDonation().getAmount() + ChatColor.WHITE + " to "
+                                    + ChatColor.GOLD + revival.getDonation().getCharityName() + ChatColor.WHITE
+                                    +"! They will be revived shortly (if they are online)");
+                            toRevive.offer(uuid);
+                        }
                     }
                 }
-            } else {
-                Bukkit.getLogger().warning("Could not find revivals array in JSON response - has the server response changed?");
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
 
@@ -65,13 +67,16 @@ public class ReanimationProtocol implements Runnable {
     }
 
     private void reanimatePlayer(UUID uuid) {
-        Player player = Bukkit.getPlayer(uuid);
+        Player player = server.getPlayer(uuid);
         //Extra checks just in case Minecraft has pinged the server again before our async call has come back
         JSONObject deathObject = new JSONObject();
         deathObject.put("uuid", uuid.toString());
         if (player != null && player.isOnline() && (player.isDead() || player.getGameMode() == GameMode.SPECTATOR)) {
             Bukkit.getLogger().info("Attempting to revive " + player.getName());
-            server.broadcastMessage("Revived " + player.getName());
+            World currentPlayerWorld = player.getWorld();
+            currentPlayerWorld.strikeLightningEffect(player.getLocation());
+            currentPlayerWorld.playEffect(player.getLocation(), Effect.SMOKE, 0, 100);
+            server.broadcastMessage(ChatColor.GOLD + player.getName() + " " + ChatColor.GREEN + "has been revived!");
             player.setGameMode(GameMode.SURVIVAL);
             httpHelper.fireAsyncPostRequestToServer("/revived", deathObject);
         } else if (player != null && player.isOnline() && !player.isDead()) {

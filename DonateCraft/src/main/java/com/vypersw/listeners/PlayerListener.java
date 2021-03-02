@@ -1,9 +1,8 @@
 package com.vypersw.listeners;
 
 import com.vypersw.network.HttpHelper;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,9 +34,15 @@ public class PlayerListener implements Listener {
     }
 
     private void sendDeathURL(Player player, String deathURL) {
-        player.spigot().sendMessage(new ComponentBuilder("You died! Please click this link to donate to a charity to buy back in!")
-                .event(new ClickEvent(ClickEvent.Action.OPEN_URL, deathURL))
-                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(deathURL).create()))
-                .create());
+        TextComponent textComponent = new TextComponent("You died! Please click ");
+        textComponent.setColor(ChatColor.RED);
+        TextComponent thisTextComp = new TextComponent("this link");
+        thisTextComp.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, deathURL));
+        thisTextComp.setUnderlined(true);
+        thisTextComp.setBold(true);
+        thisTextComp.setColor(ChatColor.GOLD);
+        TextComponent moreTextComp = new TextComponent(" to donate to a charity to buy back in!");
+        moreTextComp.setColor(ChatColor.RED);
+        player.spigot().sendMessage(textComponent, thisTextComp, moreTextComp);
     }
 }

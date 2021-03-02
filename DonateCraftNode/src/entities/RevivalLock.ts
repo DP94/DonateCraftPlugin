@@ -10,11 +10,9 @@ export class RevivalLock {
     @Column()
     key!: string;
 
-    @Column()
-    unlockurl!: string;
-
     @OneToOne(type => Donation, {
         cascade: true,
+        eager: true
     }) @JoinColumn()
     donation?: Donation;
 

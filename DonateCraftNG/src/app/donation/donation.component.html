@@ -11,10 +11,7 @@
         <div class="charity-info-wrapper">
           <span class="charity-info charity-name">{{ charity.name }}</span>
           <span class="charity-info charity-description"> {{ charity.description }}</span>
-          <button class="btn btn-success charity-donate charity-info">
-            <a class="donate-link"
-               href="{{directiveEnv.justGivingDonateUrl}}{{charity.id}}?exiturl={{directiveEnv.fullAPIUrl}}callback?data=JUSTGIVING-DONATION-ID|{{playerKey}}">Donate</a>
-          </button>
+          <button class="btn btn-success charity-donate charity-info" (click)="onJGClick(charity)">Donate</button>
         </div>
       </td>
     </tr>

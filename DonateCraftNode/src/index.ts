@@ -90,27 +90,11 @@ connectToDB().then(async () => {
             if (lock === undefined) {
                 lock = new RevivalLock();
                 lock.key = data.uuid;
-                lock.unlockurl = '';
                 lock.unlocked = false;
                 await getManager().save(lock);
                 response.send('test');
             } else {
                 response.status(400).send('Lock already exists')
-            }
-        } catch (e) {
-            console.log(e);
-        }
-    });
-
-    app.get('/unlockURL/:key', jsonParser, async (request, response) => {
-        const key = request.params.key;
-        try {
-            const lockRepository = getManager().getRepository(RevivalLock);
-            let lock: RevivalLock | undefined = await lockRepository.findOne({key: key});
-            if (lock === undefined) {
-                response.status(404).send('Lock not found for key: ' + key);
-            } else {
-                response.send(lock.unlockurl);
             }
         } catch (e) {
             console.log(e);
@@ -162,7 +146,7 @@ connectToDB().then(async () => {
             response.status(404).send("No donation id found");
             return;
         }
-        const donationData = await util.promisify(xmlToJson)("http://api.staging.justgiving.com/" + DC_JG_API_KEY + "/v1/donation/" + donationid);
+        const donationData = await util.promisify(xmlToJson)(`http://api.staging.justgiving.com/${DC_JG_API_KEY}/v1/donation/${donationid}`);
         if (donationData && donationData.donation && donationData.donation.status && donationData.donation.status.length > 0) {
             try {
                 // If data is returned and we have a status
@@ -184,6 +168,9 @@ connectToDB().then(async () => {
                             donation.amount = donationData.donation.amount;
                             donation.charity = donationData.donation.charityId;
                             donation.uuid = key;
+
+                            const charityData = await util.promisify(xmlToJson)("http://api.staging.justgiving.com/" + DC_JG_API_KEY + "/v1/charity/" + donation.charity);
+                            donation.charityName = charityData.charity.name;
                             donation.date = new Date();
 
                             await donationRepository.save(donation);
@@ -192,9 +179,9 @@ connectToDB().then(async () => {
                             await getManager().save(lock);
                         }
                         response.redirect('/#/?status=success');
-                    } else if (status === "Failed") {
+                    } else if (status === "Failed" || status === "Cancelled") {
                         response.sendStatus(500);
-                        response.redirect('/#/?status=fail');
+                        response.redirect('/#/?status=error');
                     }
                 }
             } catch (e) {
@@ -202,7 +189,7 @@ connectToDB().then(async () => {
             }
         }
     })
-});
+}).then((error) => console.log(error));
 
 function xmlToJson(url: string, callback: Function) {
     const req = http.get(url, (res: http.IncomingMessage) => {
@@ -240,6 +227,7 @@ function connectToDB() {
             Player, Donation, RevivalLock
         ],
         synchronize: true,
-        logging: false
+        logging: false,
+        bigNumberStrings: false,
     });
 }

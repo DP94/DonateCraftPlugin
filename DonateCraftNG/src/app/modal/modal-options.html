@@ -17,3 +17,13 @@
     <span>Please click </span><a class="error-try-again" (click)="onErrorTryAgainClick(modal)">here</a><span> to try again.</span>
   </div>
 </ng-template>
+
+<ng-template #warningContent let-modal>
+  <div class="modal-body warning-modal">
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <p>There is no record of a Minecraft death matching the supplied user ID.</p>
+    <p>If you decide to donate, nothing will happen in game; but the charity will still receive your donation!</p>
+  </div>
+</ng-template>

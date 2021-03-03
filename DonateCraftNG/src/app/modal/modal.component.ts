@@ -24,11 +24,15 @@ import {Router} from '@angular/router';
     }
 
     .success-modal {
-        background-color: #9be69b;
+      background-color: #9be69b;
     }
 
     .error-modal {
       background-color: #ef6b6b;
+    }
+
+    .warning-modal {
+      background-color: #ffc107;
     }
 
     .error-try-again {
@@ -43,13 +47,24 @@ export class ModalComponent {
 
   @ViewChild('successContent') successContent;
   @ViewChild('errorContent') errorContent;
+  @ViewChild('warningContent') warningContent;
 
   key: string;
+  modalBody: string;
 
   constructor(private modalService: NgbModal, private router: Router) {}
 
   showSuccessModal(): void {
     this.modalService.open(this.successContent);
+  }
+
+  showWarningModal(): void {
+    this.modalService.open(this.warningContent);
+  }
+
+  showWarningModalWithText(text): void {
+    this.modalBody = text;
+    this.modalService.open(this.warningContent);
   }
 
   showErrorModal(): void {

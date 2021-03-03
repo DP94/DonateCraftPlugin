@@ -61,6 +61,23 @@ connectToDB().then(async () => {
         }
     });
     // Revival API
+
+    //GET to see if a lock exists or not
+    app.get('/lock/:id', jsonParser, async (request, response) => {
+        const key = request.params.id;
+        if (key === undefined) {
+            return;
+        }
+        const revivalRepository = getManager().getRepository(RevivalLock);
+        let revivalLock: RevivalLock | undefined = await revivalRepository.findOne({key: key});
+        if (revivalLock === undefined || revivalLock === null) {
+            response.end(JSON.stringify(false));
+        } else {
+            response.end(JSON.stringify(true));
+        }
+        return;
+    });
+
     app.post('/lock', jsonParser, async (request, response) => {
         const data: Player = request.body.death;
         // Register key into DB
@@ -153,9 +170,8 @@ connectToDB().then(async () => {
                         const lockRepository = getManager().getRepository(RevivalLock);
                         let lock: RevivalLock | undefined = await lockRepository.findOne({key: key})
                         if (lock === undefined) {
-                            // We have a donation that we can't reference.
-                            console.log(`Cannot find associated lock for donation: ${donationid} key: ${key}`);
-                            response.redirect(`/#/?status=error&key=${key}`);
+                            //In the event of someone donating when no lock is present
+                            response.redirect('/#/?status=success');
                             return;
                         } else if (!lock.unlocked) {
                             const donationRepository = getManager().getRepository(Donation);

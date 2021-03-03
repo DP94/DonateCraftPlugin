@@ -1,11 +1,33 @@
 package com.vypersw;
 
 import com.vypersw.response.Revival;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class MessageHelper {
+
+    private final String serverURL;
+
+    public MessageHelper(String serverURL) {
+        this.serverURL = serverURL;
+    }
+
+    public void sendDeathURL(Player player) {
+        String deathURL = serverURL + "#donate?key=" + player.getUniqueId().toString();
+        TextComponent textComponent = new TextComponent("You died! Please click ");
+        textComponent.setColor(net.md_5.bungee.api.ChatColor.RED);
+        TextComponent thisTextComp = new TextComponent("this link");
+        thisTextComp.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, deathURL));
+        thisTextComp.setUnderlined(true);
+        thisTextComp.setBold(true);
+        thisTextComp.setColor(net.md_5.bungee.api.ChatColor.GOLD);
+        TextComponent moreTextComp = new TextComponent(" to donate to a charity to buy back in!");
+        moreTextComp.setColor(net.md_5.bungee.api.ChatColor.RED);
+        player.spigot().sendMessage(textComponent, thisTextComp, moreTextComp);
+    }
 
     public String getDonationMessageFromRevival(Player player, Revival revival) {
         StringBuilder builder = new StringBuilder();

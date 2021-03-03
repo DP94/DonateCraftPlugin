@@ -36,12 +36,15 @@ public class ReanimationProtocolTest {
     @Mock
     private HttpHelper httpHelper;
 
+    @Mock
+    private MessageHelper messageHelper;
+
     private ReanimationProtocol reanimationProtocol;
     private UUID uuid;
 
     @Before
     public void before() {
-        reanimationProtocol = new ReanimationProtocol(server, "", httpHelper);
+        reanimationProtocol = new ReanimationProtocol(server, messageHelper, httpHelper);
         uuid = UUID.randomUUID();
         when(server.getLogger()).thenReturn(logger);
         when(server.getPlayer(uuid)).thenReturn(player);

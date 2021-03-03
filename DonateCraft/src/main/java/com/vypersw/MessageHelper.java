@@ -10,9 +10,11 @@ import org.bukkit.entity.Player;
 public class MessageHelper {
 
     private final String serverURL;
+    private final DecimalFormat donationAmountFormat;
 
     public MessageHelper(String serverURL) {
         this.serverURL = serverURL;
+        this.donationAmountFormat = new DecimalFormat("00.00");
     }
 
     public void sendDeathURL(Player player) {
@@ -39,7 +41,7 @@ public class MessageHelper {
         if (!revival.getDonation().isPrivate()) {
             builder.append(ChatColor.GREEN);
             builder.append(" £");
-            builder.append(revival.getDonation().getAmount());
+            builder.append(donationAmountFormat.format(revival.getDonation().getAmount()));
         }
         builder.append(ChatColor.WHITE)
                 .append(" to ")

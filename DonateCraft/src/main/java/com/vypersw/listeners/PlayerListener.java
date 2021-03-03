@@ -12,9 +12,11 @@ import org.json.JSONObject;
 public class PlayerListener implements Listener {
 
     private final String serverURL;
+    private final HttpHelper httpHelper;
 
-    public PlayerListener(String serverURL) {
+    public PlayerListener(String serverURL, HttpHelper httpHelper) {
         this.serverURL = serverURL;
+        this.httpHelper = httpHelper;
     }
 
 
@@ -29,7 +31,6 @@ public class PlayerListener implements Listener {
         deathObject.put("death", deathProperties);
 
         final String deathURL = serverURL + "#donate?key=" + event.getEntity().getUniqueId().toString();
-        HttpHelper httpHelper = new HttpHelper(serverURL);
         httpHelper.fireAsyncPostRequestToServer("/lock", deathObject, () -> sendDeathURL(event.getEntity(), deathURL));
     }
 

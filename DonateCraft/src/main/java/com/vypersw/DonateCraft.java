@@ -1,6 +1,7 @@
 package com.vypersw;
 
 import com.vypersw.listeners.PlayerListener;
+import com.vypersw.network.HttpHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -14,8 +15,9 @@ public class DonateCraft extends JavaPlugin {
     public void onEnable() {
         ResourceBundle bundle = ResourceBundle.getBundle("env");
         final String serverUrl = bundle.getString("SERVER_URL");
-        getServer().getPluginManager().registerEvents(new PlayerListener(serverUrl), this);
-        ReanimationProtocol reanimationProtocol = new ReanimationProtocol(getServer(), serverUrl);
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, reanimationProtocol, 5 * TICKS_TO_SECONDS, 10 * TICKS_TO_SECONDS);
+        HttpHelper httpHelper = new HttpHelper(serverUrl);
+        getServer().getPluginManager().registerEvents(new PlayerListener(serverUrl, httpHelper), this);
+        ReanimationProtocol reanimationProtocol = new ReanimationProtocol(getServer(), serverUrl, httpHelper);
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, reanimationProtocol, 5 * TICKS_TO_SECONDS, 10 * TICKS_TO_SECONDS);
     }
 }

@@ -21,7 +21,6 @@ public class HttpHelper {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
                 .build();
-        HttpClient.Builder clientBuilder = HttpClient.newBuilder();
         HttpClient client = HttpClient.newBuilder().build();
         if (taskToRunAfterAsyncResponse != null) {
             client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(HttpResponse::body).thenRun(taskToRunAfterAsyncResponse);

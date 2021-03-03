@@ -3,3 +3,7 @@ version: 0.1-SNAPSHOT
 author: Various
 main: com.vypersw.DonateCraft
 api-version: 1.16
+commands:
+  dc:
+    description: Main donate craft command
+    usage: /<command>

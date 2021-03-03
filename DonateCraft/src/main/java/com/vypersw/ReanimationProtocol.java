@@ -18,14 +18,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class ReanimationProtocol implements Runnable {
 
     private final Server server;
-    private final String serverURL;
     private BlockingQueue<UUID> toRevive = new LinkedBlockingQueue<>();
+    private final MessageHelper messageHelper;
     private final HttpHelper httpHelper;
-    private final MessageHelper messageHelper = new MessageHelper();
 
-    public ReanimationProtocol(Server server, String serverURL, HttpHelper httpHelper) {
+    public ReanimationProtocol(Server server, MessageHelper messageHelper, HttpHelper httpHelper) {
         this.server = server;
-        this.serverURL = serverURL;
+        this.messageHelper = messageHelper;
         this.httpHelper = httpHelper;
     }
 

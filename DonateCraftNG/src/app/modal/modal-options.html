@@ -1,0 +1,19 @@
+<ng-template #successContent let-modal>
+  <div class="modal-body success-modal">
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <p>Thank you for your donation!</p>
+    <p>You will be revived in Minecraft shortly. Feel free to close this page, or click anywhere to close this popup</p>
+  </div>
+</ng-template>
+
+<ng-template #errorContent let-modal>
+  <div class="modal-body error-modal">
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <p>Just Giving returned an error when processing the donation.</p>
+    <span>Please click </span><a class="error-try-again" (click)="onErrorTryAgainClick(modal)">here</a><span> to try again.</span>
+  </div>
+</ng-template>

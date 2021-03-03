@@ -1,26 +1,41 @@
-import {AfterContentChecked, Component, OnDestroy, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Player} from '../response/player';
-import {AppService} from '../app.service';
 import {Donation} from '../response/donation';
 import {DeathService} from './death.service';
+import {ActivatedRoute} from '@angular/router';
+import {ModalComponent} from '../modal/modal.component';
 
 @Component({
   selector: 'app-deaths',
   templateUrl: './deaths.component.html',
   styleUrls: ['./deaths.component.css']
 })
-export class DeathsComponent implements OnInit, OnDestroy {
+export class DeathsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   deaths: Player[];
   playerPing;
+  @ViewChild('modal') modal: ModalComponent;
 
-  constructor(private deathService: DeathService) {}
+  constructor(private deathService: DeathService, private activatedRoute: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.getPlayerStats();
     this.playerPing = setInterval(() => {
       this.getPlayerStats();
     },  10000);
+  }
+
+  ngAfterViewInit(): void {
+    this.activatedRoute.queryParams.subscribe(params => {
+      const status = params.status;
+      if (status === 'success' || status === 'pending') {
+        this.modal.showSuccessModal();
+      } else if (status === 'error' || status === 'cancelled') {
+        const key = params.key;
+        this.modal.key = key;
+        this.modal.showErrorModal();
+      }
+    });
   }
 
   ngOnDestroy(): void {

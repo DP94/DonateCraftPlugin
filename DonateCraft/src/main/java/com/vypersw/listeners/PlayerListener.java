@@ -1,13 +1,14 @@
 package com.vypersw.listeners;
 
 import com.vypersw.network.HttpHelper;
+import com.vypersw.response.Death;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.*;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.json.JSONObject;
 
 public class PlayerListener implements Listener {
 
@@ -22,16 +23,13 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     void onPlayerDeath(PlayerDeathEvent event) {
-
-        JSONObject deathProperties = new JSONObject();
-        deathProperties.put("uuid", event.getEntity().getUniqueId().toString());
-        deathProperties.put("name", event.getEntity().getDisplayName());
-        deathProperties.put("lastdeathreason", event.getDeathMessage());
-        JSONObject deathObject = new JSONObject();
-        deathObject.put("death", deathProperties);
-
+        Death death = new Death();
+        death.setUuid(event.getEntity().getUniqueId());
+        death.setName(event.getEntity().getName());
+        death.setLastDeathReason(event.getDeathMessage());
         final String deathURL = serverURL + "#donate?key=" + event.getEntity().getUniqueId().toString();
-        httpHelper.fireAsyncPostRequestToServer("/lock", deathObject, () -> sendDeathURL(event.getEntity(), deathURL));
+        httpHelper.fireAsyncPostRequestToServer("/lock", death, () -> sendDeathURL(event.getEntity(), deathURL));
+
     }
 
     private void sendDeathURL(Player player, String deathURL) {

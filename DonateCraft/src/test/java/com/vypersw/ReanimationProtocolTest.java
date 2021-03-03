@@ -1,9 +1,12 @@
 package com.vypersw;
 
 import com.vypersw.network.HttpHelper;
-import org.bukkit.*;
+import com.vypersw.response.Revival;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,17 +37,18 @@ public class ReanimationProtocolTest {
     private HttpHelper httpHelper;
 
     private ReanimationProtocol reanimationProtocol;
+    private UUID uuid;
 
     @Before
     public void before() {
         reanimationProtocol = new ReanimationProtocol(server, "", httpHelper);
+        uuid = UUID.randomUUID();
         when(server.getLogger()).thenReturn(logger);
+        when(server.getPlayer(uuid)).thenReturn(player);
     }
 
     @Test
     public void testThatPlayerWhoIsInSurvivalModeIsNotRevived() {
-        UUID uuid = UUID.randomUUID();
-        when(server.getPlayer(uuid)).thenReturn(player);
         when(player.getGameMode()).thenReturn(GameMode.SURVIVAL);
         reanimationProtocol.reanimatePlayer(uuid);
         verify(player, never()).setGameMode(GameMode.SURVIVAL);
@@ -52,8 +56,6 @@ public class ReanimationProtocolTest {
 
     @Test
     public void testThatAlivePlayerIsNotRevived() {
-        UUID uuid = UUID.randomUUID();
-        when(server.getPlayer(uuid)).thenReturn(player);
         when(player.isDead()).thenReturn(false);
         reanimationProtocol.reanimatePlayer(uuid);
         verify(player, never()).setGameMode(GameMode.SURVIVAL);
@@ -61,20 +63,19 @@ public class ReanimationProtocolTest {
 
     @Test
     public void testThatOnlineAndDeadPlayerIsRevived() {
-        UUID uuid = UUID.randomUUID();
-        when(server.getPlayer(uuid)).thenReturn(player);
+        Revival revival = new Revival();
+        revival.setKey(uuid.toString());
         when(player.isOnline()).thenReturn(true);
         when(player.isDead()).thenReturn(true);
         when(player.getWorld()).thenReturn(world);
         reanimationProtocol.reanimatePlayer(uuid);
         verify(player).setGameMode(GameMode.SURVIVAL);
         verify(world).strikeLightningEffect(player.getLocation());
+        verify(httpHelper).fireAsyncPostRequestToServer("/revived", revival);
     }
 
     @Test
     public void testThatRevivedPlayerIsTeleportedToSpawnIfNoBedSet() {
-        UUID uuid = UUID.randomUUID();
-        when(server.getPlayer(uuid)).thenReturn(player);
         when(player.isOnline()).thenReturn(true);
         when(player.isDead()).thenReturn(true);
         when(player.getWorld()).thenReturn(world);
@@ -84,8 +85,6 @@ public class ReanimationProtocolTest {
 
     @Test
     public void testThatRevivedPlayerIsTeleportedToBeIfIsSet() {
-        UUID uuid = UUID.randomUUID();
-        when(server.getPlayer(uuid)).thenReturn(player);
         when(player.isOnline()).thenReturn(true);
         when(player.isDead()).thenReturn(true);
         when(player.getWorld()).thenReturn(world);
@@ -95,4 +94,13 @@ public class ReanimationProtocolTest {
         verify(player).teleport(bedLocation);
     }
 
+    @Test
+    public void testThatPlayerWhoIsntDeadButIsEligibleForRevivalSendsRequestToServerToDeleteLock() {
+        Revival revival = new Revival();
+        revival.setKey(uuid.toString());
+        when(player.isOnline()).thenReturn(true);
+        when(player.isDead()).thenReturn(false);
+        reanimationProtocol.reanimatePlayer(uuid);
+        verify(httpHelper).fireAsyncPostRequestToServer("/revived", revival);
+    }
 }

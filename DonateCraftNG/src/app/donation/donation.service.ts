@@ -14,4 +14,8 @@ export class DonationService {
   getCharityDetails(id: number): Observable<Charity> {
     return this.httpClient.get<Charity>(environment.justGivingAPIUrl + '/charity/' + id);
   }
+
+  checkIfRevivalKeyExists(id: string): Observable<boolean> {
+    return this.httpClient.get<boolean>(`${environment.apiUrl}lock/${id}`);
+  }
 }

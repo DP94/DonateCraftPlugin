@@ -6,13 +6,16 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import java.text.DecimalFormat;
 
 public class MessageHelper {
 
     private final String serverURL;
+    private final DecimalFormat donationAmountFormat;
 
     public MessageHelper(String serverURL) {
         this.serverURL = serverURL;
+        this.donationAmountFormat = new DecimalFormat("00.00");
     }
 
     public void sendDeathURL(Player player) {
@@ -39,7 +42,7 @@ public class MessageHelper {
         if (!revival.getDonation().isPrivate()) {
             builder.append(ChatColor.GREEN);
             builder.append(" £");
-            builder.append(revival.getDonation().getAmount());
+            builder.append(donationAmountFormat.format(revival.getDonation().getAmount()));
         }
         builder.append(ChatColor.WHITE)
                 .append(" to ")

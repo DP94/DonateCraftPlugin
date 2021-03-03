@@ -71,7 +71,16 @@ public class MessageHelperTest {
         donation.setAmount(10.50);
         String result = messageHelper.getDonationMessageFromRevival(player, revival);
         //§ is inserted by ChatColor.COLOR, i.e. ChatColor.WHITE is §f
-        String expected = "§6Test§f just donated§a £10.5§f to §6Test charity§f! They will be revived shortly (if they are online)";
+        String expected = "§6Test§f just donated§a £10.50§f to §6Test charity§f! They will be revived shortly (if they are online)";
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void testThatDonationFormatsCorrectlyIfWholeNumber(){
+        donation.setAmount(10.00);
+        String result = messageHelper.getDonationMessageFromRevival(player, revival);
+        //§ is inserted by ChatColor.COLOR, i.e. ChatColor.WHITE is §f
+        String expected = "§6Test§f just donated§a £10.00§f to §6Test charity§f! They will be revived shortly (if they are online)";
         assertEquals(expected, result);
     }
 

@@ -1,5 +1,10 @@
 package com.vypersw.response;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
+
+import java.util.Objects;
+
+@JsonRootName(value = "revival")
 public class Revival {
     private long id;
     private String key;
@@ -36,5 +41,13 @@ public class Revival {
 
     public void setDonation(Donation donation) {
         this.donation = donation;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Revival revival = (Revival) o;
+        return Objects.equals(key, revival.key);
     }
 }

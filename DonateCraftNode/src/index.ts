@@ -111,7 +111,7 @@ connectToDB().then(async () => {
     });
 
     app.post('/revived', jsonParser, async (request, response) => {
-        const uuid = request.body.uuid;
+        const uuid = request.body.revival.key;
         try {
             const lockRepository = getManager().getRepository(RevivalLock);
             let lock: RevivalLock | undefined = await lockRepository.findOne({key: uuid});

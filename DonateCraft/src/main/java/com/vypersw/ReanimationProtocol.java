@@ -5,7 +5,6 @@ import com.vypersw.network.HttpHelper;
 import com.vypersw.response.Revival;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
-import org.json.JSONObject;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -24,10 +23,10 @@ public class ReanimationProtocol implements Runnable {
     private final HttpHelper httpHelper;
     private final MessageHelper messageHelper = new MessageHelper();
 
-    public ReanimationProtocol(Server server, String serverURL) {
+    public ReanimationProtocol(Server server, String serverURL, HttpHelper httpHelper) {
         this.server = server;
         this.serverURL = serverURL;
-        this.httpHelper = new HttpHelper(serverURL);
+        this.httpHelper = httpHelper;
     }
 
     @Override
@@ -47,7 +46,7 @@ public class ReanimationProtocol implements Runnable {
                         UUID uuid = UUID.fromString(revival.getKey());
                         Player player = server.getPlayer(uuid);
                         if (player != null && player.getGameMode() == GameMode.SPECTATOR) {
-                            Bukkit.broadcastMessage(messageHelper.getDonationMessageFromRevival(player, revival));
+                            server.broadcastMessage(messageHelper.getDonationMessageFromRevival(player, revival));
                             toRevive.offer(uuid);
                         }
                     }
@@ -64,21 +63,26 @@ public class ReanimationProtocol implements Runnable {
         }
     }
 
-    private void reanimatePlayer(UUID uuid) {
+    public void reanimatePlayer(UUID uuid) {
         Player player = server.getPlayer(uuid);
+        Revival revival = new Revival();
+        revival.setKey(uuid.toString());
         //Extra checks just in case Minecraft has pinged the server again before our async call has come back
-        JSONObject deathObject = new JSONObject();
-        deathObject.put("uuid", uuid.toString());
         if (player != null && player.isOnline() && (player.isDead() || player.getGameMode() == GameMode.SPECTATOR)) {
-            Bukkit.getLogger().info("Attempting to revive " + player.getName());
+            server.getLogger().info("Attempting to revive " + player.getName());
             World currentPlayerWorld = player.getWorld();
+            if (player.getBedSpawnLocation() == null) {
+                player.teleport(currentPlayerWorld.getSpawnLocation());
+            } else {
+                player.teleport(player.getBedSpawnLocation());
+            }
             currentPlayerWorld.strikeLightningEffect(player.getLocation());
             currentPlayerWorld.playEffect(player.getLocation(), Effect.SMOKE, 0, 100);
             server.broadcastMessage(ChatColor.GOLD + player.getName() + " " + ChatColor.GREEN + "has been revived!");
             player.setGameMode(GameMode.SURVIVAL);
-            httpHelper.fireAsyncPostRequestToServer("/revived", deathObject);
+            httpHelper.fireAsyncPostRequestToServer("/revived", revival);
         } else if (player != null && player.isOnline() && !player.isDead()) {
-            httpHelper.fireAsyncPostRequestToServer("/revived", deathObject);
+            httpHelper.fireAsyncPostRequestToServer("/revived", revival);
         }
     }
 }

@@ -37,6 +37,8 @@ ALT: Build Minecraft plugin (look out for the path in pom.xml) and drag into plu
 2. Modify src/environments/environment.ts replacing "redacted" with your JustGiving API key.
 3. Run `npm start`
 4. Go to localhost:4200 to assert it is live.
+5. Additional steps: Modify envrionment.prod.ts to contain required values
+6. Run ng build --prod to generate all minified HTML & Javascript files; drag these into the "build/public" folder in the DonateCraftNode project to allow the node server to serve the Angular application
 
 ## DonateCraftNode (Backend API)
 

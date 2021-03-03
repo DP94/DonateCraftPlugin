@@ -31,11 +31,13 @@ export class DonationComponent implements AfterViewInit {
     this.charityIds.push(13441, 2357, 255811, 2201, 182244, 233, 11200, 300);
 
     this.setPlayerKeyFromURL(this.activatedRoute);
-    this.donationService.checkIfRevivalKeyExists(this.playerKey).subscribe(exists => {
-      if (!exists) {
+    if (this.playerKey && this.playerKey !== '') {
+      this.donationService.checkIfRevivalKeyExists(this.playerKey).subscribe(exists => {
+        if (!exists) {
           this.modal.showWarningModal();
-      }
-    });
+        }
+      });
+    }
 
     this.charityIds.forEach((id) => {
         this.setCharityInformation(id);

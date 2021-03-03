@@ -27,3 +27,4 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm ci --prefix DonateCraftNG/
     - run: npm run build --prefix DonateCraftNG/ --if-present
+    - run: npm run test --prefix DonateCraftNG/

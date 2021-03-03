@@ -27,7 +27,7 @@ public class PlayerListener implements Listener {
         death.setUuid(event.getEntity().getUniqueId());
         death.setName(event.getEntity().getName());
         death.setLastDeathReason(event.getDeathMessage());
-        final String deathURL = serverURL + "#donate?key=" + event.getEntity().getUniqueId().toString();
+        final String deathURL = serverURL + "#donate;key=" + event.getEntity().getUniqueId().toString();
         httpHelper.fireAsyncPostRequestToServer("/lock", death, () -> sendDeathURL(event.getEntity(), deathURL));
 
     }

@@ -15,7 +15,6 @@ export class DonationComponent implements OnInit {
   finishedLoading = false;
   charitiesLoaded = 0;
   playerKey = '';
-  directiveEnv = environment;
 
   charityIds = new Array<number>();
 
@@ -33,9 +32,7 @@ export class DonationComponent implements OnInit {
         this.charitiesLoaded++;
         this.finishedLoading = (this.charitiesLoaded === this.charityIds.length);
         if (this.finishedLoading) {
-          this.activatedRoute.queryParams.subscribe(params => {
-            this.playerKey = params.key;
-          });
+          this.setPlayerKeyFromURL(this.activatedRoute);
         }
       });
     });
@@ -45,6 +42,12 @@ export class DonationComponent implements OnInit {
     window.open(environment.justGivingDonateUrl + charity.id + '?exiturl=' + environment.fullAPIUrl
                                                     + 'callback?data=JUSTGIVING-DONATION-ID|'
                                                     + this.playerKey, '_blank');
+  }
+
+  setPlayerKeyFromURL(route: ActivatedRoute): void {
+    route.paramMap.subscribe(params => {
+      this.playerKey = params.get('key');
+    });
   }
 
 }

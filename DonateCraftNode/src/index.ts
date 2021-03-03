@@ -150,13 +150,12 @@ connectToDB().then(async () => {
                     const status = donationData.status;
                     // We can also unlock now that the donation is accepted and hits the minimum value to avoid future calls.
                     if (status === "Accepted" || status === "Pending") {
-                        const reference = donationData.thirdPartyReference;
                         const lockRepository = getManager().getRepository(RevivalLock);
                         let lock: RevivalLock | undefined = await lockRepository.findOne({key: key})
                         if (lock === undefined) {
                             // We have a donation that we can't reference.
                             console.log(`Cannot find associated lock for donation: ${donationid} key: ${key}`);
-                            response.redirect('/#/?status=error');
+                            response.redirect(`/#/?status=error&key=${key}`);
                             return;
                         } else if (!lock.unlocked) {
                             const donationRepository = getManager().getRepository(Donation);
@@ -181,8 +180,7 @@ connectToDB().then(async () => {
                             return;
                         }
                     } else if (status === "Failed" || status === "Cancelled") {
-                        response.sendStatus(500);
-                        response.redirect('/#/?status=error');
+                        response.redirect(`/#/?status=error&key=${key}`);
                         return;
                     }
                 }

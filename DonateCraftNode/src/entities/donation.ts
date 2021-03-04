@@ -1,20 +1,17 @@
-import {Column, Entity, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, ManyToOne, PrimaryColumn} from "typeorm";
 import {Player} from "./player";
 
 @Entity()
 export class Donation {
 
-    @PrimaryGeneratedColumn()
+    @PrimaryColumn()
     id!: number;
-
-    @Column()
-    donationId!: number;
 
     @Column({type: "decimal", precision: 15, scale: 2, nullable: true})
     amount!: number;
 
     @ManyToOne(() => Player, player => player.donations)
-    uuid!: string;
+    player!: Player;
 
     @Column()
     date!: Date;

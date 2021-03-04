@@ -1,5 +1,6 @@
 import {Column, Entity, OneToMany, PrimaryColumn} from 'typeorm';
 import {Donation} from "./donation";
+import {Death} from "./death";
 
 @Entity()
 export class Player {
@@ -8,20 +9,16 @@ export class Player {
     uuid!: string;
 
     @Column()
-    deathcount!: number;
-
-    @Column()
     name!: string;
 
-    @Column()
-    lastdeathreason!: string;
-
-    @OneToMany(() => Donation, donation => donation.uuid, {
+    @OneToMany(() => Donation, donation => donation.player, {
         eager: true
     })
     donations?: Donation[];
 
-    constructor() {
-        this.deathcount = 0;
-    }
+    @OneToMany(() => Death, death => death.player, {
+        cascade: true,
+        eager: true
+    })
+    deaths!: Death[];
 }

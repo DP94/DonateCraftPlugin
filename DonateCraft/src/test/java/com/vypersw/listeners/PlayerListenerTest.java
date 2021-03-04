@@ -12,7 +12,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.inventory.ItemFactory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -31,7 +30,6 @@ import java.util.logging.Logger;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.longThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -110,7 +108,7 @@ public class PlayerListenerTest {
     runnable.run();
 
     Death death = deathArgumentCaptor.getValue();
-    assertThat(death.getLastDeathReason(), equalTo(DEATH_MESSAGE));
+    assertThat(death.getReason(), equalTo(DEATH_MESSAGE));
     assertThat(death.getName(), equalTo(PLAYER_NAME));
     assertThat(death.getUuid(), equalTo(PLAYER_UUID));
 

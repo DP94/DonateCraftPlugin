@@ -9,6 +9,8 @@ import path from "path";
 import http from 'http';
 import {RevivalsDto} from "./dtos/revivals.dto";
 import {Donation} from "./entities/donation";
+import {Death} from "./entities/death";
+import {DeathDto} from "./dtos/death.dto";
 
 const util = require('util')
 require('dotenv').config()
@@ -45,13 +47,13 @@ connectToDB().then(async () => {
 
     app.get('/players', jsonParser, async (request, response) => {
         try {
-            const deathRepository = getManager().getRepository(Player);
-            const players: Player[] = await deathRepository.find({
-                order: {
-                    deathcount: "DESC",
-                    lastdeathreason: "DESC"
-                }
-            });
+            const playerRepository = getManager().getRepository(Player);
+            const players: Player[] = await playerRepository.createQueryBuilder('player')
+                .leftJoinAndSelect('player.deaths', 'deaths')
+                .leftJoinAndSelect('player.donations', 'donations')
+                .loadRelationCountAndMap('player.deaths', 'player.deaths')
+                .getMany();
+            players.sort((a,b) => (a.deaths > b.deaths) ? -1 : ((b.deaths > a.deaths) ? 1 : 0))
             const playersDTO: PlayersDto = new PlayersDto();
             playersDTO.players = players;
             response.setHeader('Content-Type', 'application/json');
@@ -79,20 +81,23 @@ connectToDB().then(async () => {
     });
 
     app.post('/lock', jsonParser, async (request, response) => {
-        const data: Player = request.body.death;
+        const data: DeathDto = request.body.death;
         // Register key into DB
         try {
             try {
-                const deathRepository = getManager().getRepository(Player);
-                let death: Player | undefined = await deathRepository.findOne({uuid: data.uuid})
-                if (death === undefined) {
-                    death = new Player();
-                    death.uuid = data.uuid;
+                const playerRepository = getManager().getRepository(Player);
+                let player: Player | undefined = await playerRepository.findOne({uuid: data.uuid})
+                if (player === undefined) {
+                    player = new Player();
+                    player.uuid = data.uuid;
                 }
-                death.name = data.name;
-                death.lastdeathreason = data.lastdeathreason;
-                death.deathcount++;
-                await getManager().save(death);
+                player.name = data.name;
+                const death = new Death();
+                death.reason = data.reason;
+                death.date = new Date();
+                death.player = player;
+                player.deaths?.push(death);
+                await getManager().save(player);
             } catch (e) {
                 console.log('Encountered issue when trying to persist user stats!');
                 console.log(e);
@@ -174,23 +179,31 @@ connectToDB().then(async () => {
                             response.redirect('/#/?status=success');
                             return;
                         } else if (!lock.unlocked) {
-                            const donationRepository = getManager().getRepository(Donation);
-                            const donation = new Donation();
-                            donation.donationId = parseInt(donationid);
-                            donation.amount = donationData.amount;
-                            donation.charity = donationData.charityId;
-                            donation.uuid = key;
+                            const playerRepository = getManager().getRepository(Player);
+                            const player = await playerRepository.findOne({uuid: key});
+                            if (player === undefined) {
+                                console.log(`Could not find a player with a key of ${key}!`)
+                                response.redirect(`/#/?status=error&key=${key}`);
+                                return;
+                            } else {
+                                const donationRepository = getManager().getRepository(Donation);
+                                const donation = new Donation();
+                                donation.id = parseInt(donationid);
+                                donation.amount = donationData.amount;
+                                donation.charity = donationData.charityId;
+                                donation.player = player;
 
-                            const charityData = await util.promisify(fireGetJSONRequest)('api.staging.justgiving.com', `/${DC_JG_API_KEY}/v1/charity/${donation.charity}`);
-                            donation.charityName = charityData.name;
-                            donation.date = new Date();
+                                const charityData = await util.promisify(fireGetJSONRequest)('api.staging.justgiving.com', `/${DC_JG_API_KEY}/v1/charity/${donation.charity}`);
+                                donation.charityName = charityData.name;
+                                donation.date = new Date();
 
-                            await donationRepository.save(donation);
-                            lock.donation = donation;
-                            lock.unlocked = true;
-                            await getManager().save(lock);
-                            response.redirect('/#/?status=success');
-                            return;
+                                await donationRepository.save(donation);
+                                lock.donation = donation;
+                                lock.unlocked = true;
+                                await getManager().save(lock);
+                                response.redirect('/#/?status=success');
+                                return;
+                            }
                         } else {
                             response.redirect('/#/?status=success');
                             return;
@@ -246,7 +259,7 @@ function connectToDB() {
         password: DC_DB_PASSWORD,
         database: "donatecraft",
         entities: [
-            Player, Donation, RevivalLock
+            Player, Donation, RevivalLock, Death
         ],
         synchronize: true,
         logging: false,

@@ -9,7 +9,7 @@ import java.util.UUID;
 public class Death {
     private UUID uuid;
     private String name;
-    private String lastDeathReason;
+    private String reason;
 
     public UUID getUuid() {
         return uuid;
@@ -27,12 +27,12 @@ public class Death {
         this.name = name;
     }
 
-    public String getLastDeathReason() {
-        return lastDeathReason;
+    public String getReason() {
+        return reason;
     }
 
-    public void setLastDeathReason(String lastDeathReason) {
-        this.lastDeathReason = lastDeathReason;
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 
     @Override
@@ -40,6 +40,6 @@ public class Death {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Death death = (Death) o;
-        return Objects.equals(uuid, death.uuid) && Objects.equals(name, death.name) && Objects.equals(lastDeathReason, death.lastDeathReason);
+        return Objects.equals(uuid, death.uuid) && Objects.equals(name, death.name) && Objects.equals(reason, death.reason);
     }
 }

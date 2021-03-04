@@ -4,8 +4,6 @@ import {Player} from './entities/player';
 import {RevivalLock} from './entities/RevivalLock';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import {PlayersDto} from "./dtos/players.dto";
-import path from "path";
 import http from 'http';
 import {RevivalsDto} from "./dtos/revivals.dto";
 import {Donation} from "./entities/donation";
@@ -28,92 +26,26 @@ if (!DC_JG_API_KEY) {
     console.error("DC_JG_API_KEY not set");
     process.exit(-1);
 }
+
+const index = require('./routes/index.route');
+const players = require('./routes/players');
+const lock = require('./routes/lock')
+
 const app = express();
 const PORT = 8000;
 const jsonParser = bodyParser.json();
+app.use(jsonParser);
+app.use('/', index);
+app.use('/players', players);
+app.use('/lock', lock);
+app.use(cors());
+app.use(express.static(process.cwd() + "/build/public/"));
+
+app.listen(PORT, () => {
+    console.log(`Server is running at http://localhost:${PORT}`);
+});
 
 connectToDB().then(async () => {
-    app.use(cors());
-    app.use(express.static(process.cwd() + "/build/public/"));
-    app.listen(PORT, () => {
-        console.log(`Server is running at http://localhost:${PORT}`);
-    });
-
-    app.get('/', (request, response) => {
-        response.sendFile(path.resolve(__dirname, 'build', 'index.html'));
-    });
-
-    app.get('/players', jsonParser, async (request, response) => {
-        try {
-            const deathRepository = getManager().getRepository(Player);
-            const players: Player[] = await deathRepository.find({
-                order: {
-                    deathcount: "DESC",
-                    lastdeathreason: "DESC"
-                }
-            });
-            const playersDTO: PlayersDto = new PlayersDto();
-            playersDTO.players = players;
-            response.setHeader('Content-Type', 'application/json');
-            response.end(JSON.stringify(playersDTO));
-        } catch (e) {
-            console.log(e);
-        }
-    });
-    // Revival API
-
-    //GET to see if a lock exists or not
-    app.get('/lock/:id', jsonParser, async (request, response) => {
-        const key = request.params.id;
-        if (key === undefined) {
-            return;
-        }
-        const revivalRepository = getManager().getRepository(RevivalLock);
-        let revivalLock: RevivalLock | undefined = await revivalRepository.findOne({key: key});
-        if (revivalLock === undefined || revivalLock === null) {
-            response.end(JSON.stringify(false));
-        } else {
-            response.end(JSON.stringify(true));
-        }
-        return;
-    });
-
-    app.post('/lock', jsonParser, async (request, response) => {
-        const data: Player = request.body.death;
-        // Register key into DB
-        try {
-            try {
-                const deathRepository = getManager().getRepository(Player);
-                let death: Player | undefined = await deathRepository.findOne({uuid: data.uuid})
-                if (death === undefined) {
-                    death = new Player();
-                    death.uuid = data.uuid;
-                }
-                death.name = data.name;
-                death.lastdeathreason = data.lastdeathreason;
-                death.deathcount++;
-                await getManager().save(death);
-            } catch (e) {
-                console.log('Encountered issue when trying to persist user stats!');
-                console.log(e);
-            }
-
-            const lockRepository = getManager().getRepository(RevivalLock);
-            let lock: RevivalLock | undefined = await lockRepository.findOne({key: data.uuid})
-            if (lock === undefined) {
-                lock = new RevivalLock();
-                lock.key = data.uuid;
-                lock.unlocked = false;
-                await getManager().save(lock);
-                response.send('test');
-            } else {
-                response.status(400).send('Lock already exists')
-            }
-        } catch (e) {
-            console.log(e);
-        }
-    });
-
     app.get('/unlocked', jsonParser, async (request, response) => {
         try {
             const lockRepository = getManager().getRepository(RevivalLock);
@@ -205,7 +137,7 @@ connectToDB().then(async () => {
             }
         }
     })
-}).then((error) => console.log(error));
+});
 
 function fireGetJSONRequest(host: string, path: string, callback: Function) {
     const options = {
@@ -253,3 +185,5 @@ function connectToDB() {
         bigNumberStrings: false,
     });
 }
+
+module.exports = app;

@@ -3,7 +3,6 @@ package com.vypersw;
 import com.vypersw.response.Revival;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import java.text.DecimalFormat;
@@ -15,7 +14,7 @@ public class MessageHelper {
 
     public MessageHelper(String serverURL) {
         this.serverURL = serverURL;
-        this.donationAmountFormat = new DecimalFormat("00.00");
+        this.donationAmountFormat = new DecimalFormat("##.00");
     }
 
     public void sendDeathURL(Player player) {

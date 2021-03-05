@@ -11,7 +11,7 @@ const router = express.Router();
 const jsonParser = bodyParser.json();
 
 //GET to see if a lock exists or not
-router.get('/lock/:id', jsonParser, async (request: Request, response: Response) => {
+router.get('/:id', jsonParser, async (request: Request, response: Response) => {
     const key = request.params.id;
     if (key === undefined) {
         return;
@@ -26,7 +26,7 @@ router.get('/lock/:id', jsonParser, async (request: Request, response: Response)
     return;
 });
 
-router.post('/lock', jsonParser, async (request: Request, response: Response) => {
+router.post('/', jsonParser, async (request: Request, response: Response) => {
     const data: DeathDto = request.body.death;
     // Register key into DB
     try {
@@ -46,6 +46,7 @@ router.post('/lock', jsonParser, async (request: Request, response: Response) =>
             player.deaths?.push(death);
             await getManager().save(player);
             console.log(`Successfully recorded death for ${data.uuid}`);
+            response.sendStatus(200);
         } catch (e) {
             console.log('Encountered issue when trying to persist user stats!');
             console.log(e);

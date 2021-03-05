@@ -48,12 +48,15 @@ connectToDB().then(async () => {
     app.get('/players', jsonParser, async (request, response) => {
         try {
             const playerRepository = getManager().getRepository(Player);
+
+            let ids: Player[] = await playerRepository.createQueryBuilder('player').leftJoinAndSelect('player.deaths', 'deaths').
+            select('player.uuid').addSelect('COUNT(*)', 'count').groupBy('player.uuid')
+                .orderBy('count', 'DESC').getMany();
+
             const players: Player[] = await playerRepository.createQueryBuilder('player')
-                .leftJoinAndSelect('player.deaths', 'deaths')
-                .leftJoinAndSelect('player.donations', 'donations')
-                .loadRelationCountAndMap('player.deaths', 'player.deaths')
-                .getMany();
-            players.sort((a,b) => (a.deaths > b.deaths) ? -1 : ((b.deaths > a.deaths) ? 1 : 0))
+                                                            .leftJoinAndSelect('player.deaths', 'deaths')
+                                                            .leftJoinAndSelect('player.donations', 'donations')
+                .andWhereInIds(ids).orderBy(getPlayerIdsSortedString(ids)).getMany();
             const playersDTO: PlayersDto = new PlayersDto();
             playersDTO.players = players;
             response.setHeader('Content-Type', 'application/json');
@@ -62,6 +65,18 @@ connectToDB().then(async () => {
             console.log(e);
         }
     });
+
+    function getPlayerIdsSortedString(ids: Player[]) {
+        let value = 'FIELD(player.uuid,'
+        for (let i = 0; i < ids.length; i++) {
+            value += `'${ids[i].uuid}'`;
+            if (i !== ids.length - 1) {
+                value += ',';
+            }
+        }
+        value += ')'
+        return value;
+    }
     // Revival API
 
     //GET to see if a lock exists or not

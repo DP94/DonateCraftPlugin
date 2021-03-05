@@ -52,7 +52,7 @@ public class MessageHelperTest {
         revival = new Revival();
         revival.setId(1L);
         donation = new Donation();
-        donation.setDonationId(1L);
+        donation.setId(1L);
         donation.setCharityName("Test charity");
         revival.setDonation(donation);
     }

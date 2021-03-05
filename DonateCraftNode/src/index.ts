@@ -33,13 +33,13 @@ const players = require('./routes/players');
 const lock = require('./routes/lock')
 
 const app = express();
+app.use(cors());
 const PORT = 8000;
 const jsonParser = bodyParser.json();
 app.use(jsonParser);
 app.use('/', index);
 app.use('/players', players);
 app.use('/lock', lock);
-app.use(cors());
 app.use(express.static(process.cwd() + "/build/public/"));
 
 app.listen(PORT, () => {

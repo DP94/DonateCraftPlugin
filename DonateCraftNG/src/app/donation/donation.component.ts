@@ -28,7 +28,12 @@ export class DonationComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.charities = new Array<Charity>();
     // Can retrieve these from DB at a later time
-    this.charityIds.push(13441, 2357, 255811, 2201, 182244, 233, 11200, 300);
+    this.charityIds.push(13441, 2357, 255811, 2201, 182244, 233, 11200, 300, 11369, 13792);
+
+    // For some reason Race Equality First does not exist in staging
+    if (environment.production) {
+      this.charityIds.push(2979600);
+    }
 
     this.setPlayerKeyFromURL(this.activatedRoute);
     if (this.playerKey && this.playerKey !== '') {

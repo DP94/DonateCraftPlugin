@@ -4,8 +4,6 @@ import {Player} from './entities/player';
 import {RevivalLock} from './entities/RevivalLock';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import {PlayersDto} from "./dtos/players.dto";
-import path from "path";
 import http from 'http';
 import {RevivalsDto} from "./dtos/revivals.dto";
 import {Donation} from "./entities/donation";
@@ -30,16 +28,24 @@ if (!DC_JG_API_KEY) {
     console.error("DC_JG_API_KEY not set");
     process.exit(-1);
 }
+
+const index = require('./routes/index.route');
+const players = require('./routes/players');
+const lock = require('./routes/lock')
+
 const app = express();
 const PORT = 8000;
 const jsonParser = bodyParser.json();
+app.use(jsonParser);
+app.use('/', index);
+app.use('/players', players);
+app.use('/lock', lock);
+app.use(cors());
+app.use(express.static(process.cwd() + "/build/public/"));
 
-connectToDB().then(async () => {
-    app.use(cors());
-    app.use(express.static(process.cwd() + "/build/public/"));
-    app.listen(PORT, () => {
-        console.log(`Server is running at http://localhost:${PORT}`);
-    });
+app.listen(PORT, () => {
+    console.log(`Server is running at http://localhost:${PORT}`);
+});
 
     app.get('/', (request, response) => {
         response.sendFile(path.resolve(__dirname, 'build', 'index.html'));
@@ -134,6 +140,7 @@ connectToDB().then(async () => {
         }
     });
 
+connectToDB().then(async () => {
     app.get('/unlocked', jsonParser, async (request, response) => {
         try {
             const lockRepository = getManager().getRepository(RevivalLock);
@@ -233,7 +240,7 @@ connectToDB().then(async () => {
             }
         }
     })
-}).then((error) => console.log(error));
+});
 
 function fireGetJSONRequest(host: string, path: string, callback: Function) {
     const options = {
@@ -281,3 +288,5 @@ function connectToDB() {
         bigNumberStrings: false,
     });
 }
+
+module.exports = app;

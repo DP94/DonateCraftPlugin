@@ -60,7 +60,7 @@ export class DeathsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getMostRecentDeathForUser(deaths: Death[]): string {
     if (deaths && deaths.length > 0) {
-      return deaths[0].reason;
+      return deaths[deaths.length - 1].reason;
     }
     return '';
   }

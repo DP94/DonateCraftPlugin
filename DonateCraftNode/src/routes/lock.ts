@@ -31,6 +31,7 @@ router.post('/', jsonParser, async (request, response) => {
     // Register key into DB
     try {
         try {
+            console.log(`Death received for ${data.uuid}! Creating death data`);
             const deathRepository = getManager().getRepository(Player);
             let death: Player | undefined = await deathRepository.findOne({uuid: data.uuid})
             if (death === undefined) {
@@ -41,19 +42,20 @@ router.post('/', jsonParser, async (request, response) => {
             death.lastdeathreason = data.lastdeathreason;
             death.deathcount++;
             await getManager().save(death);
+            console.log(`Successfully recorded death for ${data.uuid}`);
         } catch (e) {
-            console.log('Encountered issue when trying to persist user stats!');
-            console.log(e);
+            console.log(`Encountered issue when trying to persist user stats! ${e}`);
         }
 
         const lockRepository = getManager().getRepository(RevivalLock);
         let lock: RevivalLock | undefined = await lockRepository.findOne({key: data.uuid})
         if (lock === undefined) {
+            console.log(`Creating a new lock for ${data.uuid}`);
             lock = new RevivalLock();
             lock.key = data.uuid;
             lock.unlocked = false;
             await getManager().save(lock);
-            response.send('test');
+            console.log(`Successfully created lock for ${data.uuid}`);
         } else {
             response.status(400).send('Lock already exists')
         }

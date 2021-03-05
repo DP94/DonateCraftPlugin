@@ -4,6 +4,7 @@ import {Donation} from '../response/donation';
 import {DeathService} from './death.service';
 import {ActivatedRoute} from '@angular/router';
 import {ModalComponent} from '../modal/modal.component';
+import {Death} from '../response/death';
 
 @Component({
   selector: 'app-deaths',
@@ -12,7 +13,7 @@ import {ModalComponent} from '../modal/modal.component';
 })
 export class DeathsComponent implements OnInit, OnDestroy, AfterViewInit {
 
-  deaths: Player[];
+  players: Player[];
   playerPing;
   @ViewChild('modal') modal: ModalComponent;
 
@@ -44,7 +45,7 @@ export class DeathsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getPlayerStats(): void {
     this.deathService.getPlayerStats().subscribe(response => {
-      this.deaths = response.players;
+      this.players = response.players;
     });
   }
 
@@ -56,4 +57,12 @@ export class DeathsComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     return total;
   }
+
+  getMostRecentDeathForUser(deaths: Death[]): string {
+    if (deaths && deaths.length > 0) {
+      return deaths[0].reason;
+    }
+    return '';
+  }
+
 }

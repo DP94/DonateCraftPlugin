@@ -4,8 +4,7 @@ import java.util.Date;
 
 public class Donation {
 
-    private long id;
-    private Long donationId;
+    private Long id;
     private Double amount;
     private Date date;
     private long charity;
@@ -17,19 +16,11 @@ public class Donation {
     }
 
     public boolean isPrivate() {
-        return amount == null && donationId != null;
+        return amount == null && id != null;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getDonationId() {
-        return donationId;
-    }
-
-    public void setDonationId(long donationId) {
-        this.donationId = donationId;
     }
 
     public Double getAmount() {

@@ -8,16 +8,18 @@ const express = require('express');
 const router = express.Router();
 const jsonParser = bodyParser.json();
 
-// @ts-ignore
-router.get('/', jsonParser, async (request, response, next) => {
+router.get('/', jsonParser, async (request: Request, response: Response, next: NextFunction) => {
     try {
-        const deathRepository = getManager().getRepository(Player);
-        const players: Player[] = await deathRepository.find({
-            order: {
-                deathcount: "DESC",
-                lastdeathreason: "DESC"
-            }
-        });
+        const playerRepository = getManager().getRepository(Player);
+
+        let ids: Player[] = await playerRepository.createQueryBuilder('player').leftJoinAndSelect('player.deaths', 'deaths').
+        select('player.uuid').addSelect('COUNT(*)', 'count').groupBy('player.uuid')
+            .orderBy('count', 'DESC').getMany();
+
+        const players: Player[] = await playerRepository.createQueryBuilder('player')
+            .leftJoinAndSelect('player.deaths', 'deaths')
+            .leftJoinAndSelect('player.donations', 'donations')
+            .andWhereInIds(ids).orderBy(getPlayerIdsSortedString(ids)).getMany();
         const playersDTO: PlayersDto = new PlayersDto();
         playersDTO.players = players;
         response.setHeader('Content-Type', 'application/json');
@@ -26,6 +28,18 @@ router.get('/', jsonParser, async (request, response, next) => {
         console.log(e);
     }
 });
+
+function getPlayerIdsSortedString(ids: Player[]) {
+    let value = 'FIELD(player.uuid,'
+    for (let i = 0; i < ids.length; i++) {
+        value += `'${ids[i].uuid}'`;
+        if (i !== ids.length - 1) {
+            value += ',';
+        }
+    }
+    value += ')'
+    return value;
+}
 
 router.get('/:id', jsonParser, async (request: Request, response: Response, next: NextFunction) => {
     const id = request.params.id;

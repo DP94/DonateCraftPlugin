@@ -7,6 +7,7 @@ import cors from 'cors';
 import http from 'http';
 import {RevivalsDto} from "./dtos/revivals.dto";
 import {Donation} from "./entities/donation";
+import {Death} from "./entities/death";
 
 const util = require('util')
 require('dotenv').config()
@@ -32,13 +33,13 @@ const players = require('./routes/players');
 const lock = require('./routes/lock')
 
 const app = express();
+app.use(cors());
 const PORT = 8000;
 const jsonParser = bodyParser.json();
 app.use(jsonParser);
 app.use('/', index);
 app.use('/players', players);
 app.use('/lock', lock);
-app.use(cors());
 app.use(express.static(process.cwd() + "/build/public/"));
 
 app.listen(PORT, () => {
@@ -112,24 +113,32 @@ connectToDB().then(async () => {
                             response.redirect('/#/?status=success');
                             return;
                         } else if (!lock.unlocked) {
-                            const donationRepository = getManager().getRepository(Donation);
-                            const donation = new Donation();
-                            donation.donationId = parseInt(donationid);
-                            donation.amount = donationData.amount;
-                            donation.charity = donationData.charityId;
-                            donation.uuid = key;
+                            const playerRepository = getManager().getRepository(Player);
+                            const player = await playerRepository.findOne({uuid: key});
+                            if (player === undefined) {
+                                console.log(`Could not find a player with a key of ${key}!`)
+                                response.redirect(`/#/?status=error&key=${key}`);
+                                return;
+                            } else {
+                                const donationRepository = getManager().getRepository(Donation);
+                                const donation = new Donation();
+                                donation.id = parseInt(donationid);
+                                donation.amount = donationData.amount;
+                                donation.charity = donationData.charityId;
+                                donation.player = player;
 
-                            const charityData = await util.promisify(fireGetJSONRequest)('api.staging.justgiving.com', `/${DC_JG_API_KEY}/v1/charity/${donation.charity}`);
-                            donation.charityName = charityData.name;
-                            donation.date = new Date();
+                                const charityData = await util.promisify(fireGetJSONRequest)('api.staging.justgiving.com', `/${DC_JG_API_KEY}/v1/charity/${donation.charity}`);
+                                donation.charityName = charityData.name;
+                                donation.date = new Date();
 
-                            await donationRepository.save(donation);
-                            lock.donation = donation;
-                            lock.unlocked = true;
-                            console.log(`Unlocking lock for player key ${key}!`);
-                            await getManager().save(lock);
-                            response.redirect('/#/?status=success');
-                            return;
+                                await donationRepository.save(donation);
+                                lock.donation = donation;
+                                lock.unlocked = true;
+                                console.log(`Unlocking lock for player key ${key}!`);
+                                await getManager().save(lock);
+                                response.redirect('/#/?status=success');
+                                return;
+                            }
                         } else {
                             console.log(`${key} has already been unlocked!`);
                             response.redirect('/#/?status=success');
@@ -187,7 +196,7 @@ function connectToDB() {
         password: DC_DB_PASSWORD,
         database: "donatecraft",
         entities: [
-            Player, Donation, RevivalLock
+            Player, Donation, RevivalLock, Death
         ],
         synchronize: true,
         logging: false,

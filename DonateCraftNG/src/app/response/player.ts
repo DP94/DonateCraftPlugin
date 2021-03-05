@@ -1,10 +1,10 @@
 import {Donation} from './donation';
+import {Death} from './death';
 
 export class Player {
-  deathcount: number;
   uuid: string;
   id: number;
   name: string;
-  lastdeathreason: string;
+  deaths: Death[];
   donations: Donation[];
 }

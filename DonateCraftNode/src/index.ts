@@ -8,7 +8,6 @@ import http from 'http';
 import {RevivalsDto} from "./dtos/revivals.dto";
 import {Donation} from "./entities/donation";
 import {Death} from "./entities/death";
-import {DeathDto} from "./dtos/death.dto";
 
 const util = require('util')
 require('dotenv').config()
@@ -47,99 +46,6 @@ app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });
 
-    app.get('/', (request, response) => {
-        response.sendFile(path.resolve(__dirname, 'build', 'index.html'));
-    });
-
-    app.get('/players', jsonParser, async (request, response) => {
-        try {
-            const playerRepository = getManager().getRepository(Player);
-
-            let ids: Player[] = await playerRepository.createQueryBuilder('player').leftJoinAndSelect('player.deaths', 'deaths').
-            select('player.uuid').addSelect('COUNT(*)', 'count').groupBy('player.uuid')
-                .orderBy('count', 'DESC').getMany();
-
-            const players: Player[] = await playerRepository.createQueryBuilder('player')
-                                                            .leftJoinAndSelect('player.deaths', 'deaths')
-                                                            .leftJoinAndSelect('player.donations', 'donations')
-                .andWhereInIds(ids).orderBy(getPlayerIdsSortedString(ids)).getMany();
-            const playersDTO: PlayersDto = new PlayersDto();
-            playersDTO.players = players;
-            response.setHeader('Content-Type', 'application/json');
-            response.end(JSON.stringify(playersDTO));
-        } catch (e) {
-            console.log(e);
-        }
-    });
-
-    function getPlayerIdsSortedString(ids: Player[]) {
-        let value = 'FIELD(player.uuid,'
-        for (let i = 0; i < ids.length; i++) {
-            value += `'${ids[i].uuid}'`;
-            if (i !== ids.length - 1) {
-                value += ',';
-            }
-        }
-        value += ')'
-        return value;
-    }
-    // Revival API
-
-    //GET to see if a lock exists or not
-    app.get('/lock/:id', jsonParser, async (request, response) => {
-        const key = request.params.id;
-        if (key === undefined) {
-            return;
-        }
-        const revivalRepository = getManager().getRepository(RevivalLock);
-        let revivalLock: RevivalLock | undefined = await revivalRepository.findOne({key: key});
-        if (revivalLock === undefined || revivalLock === null) {
-            response.end(JSON.stringify(false));
-        } else {
-            response.end(JSON.stringify(true));
-        }
-        return;
-    });
-
-    app.post('/lock', jsonParser, async (request, response) => {
-        const data: DeathDto = request.body.death;
-        // Register key into DB
-        try {
-            try {
-                const playerRepository = getManager().getRepository(Player);
-                let player: Player | undefined = await playerRepository.findOne({uuid: data.uuid})
-                if (player === undefined) {
-                    player = new Player();
-                    player.uuid = data.uuid;
-                }
-                player.name = data.name;
-                const death = new Death();
-                death.reason = data.reason;
-                death.date = new Date();
-                death.player = player;
-                player.deaths?.push(death);
-                await getManager().save(player);
-            } catch (e) {
-                console.log('Encountered issue when trying to persist user stats!');
-                console.log(e);
-            }
-
-            const lockRepository = getManager().getRepository(RevivalLock);
-            let lock: RevivalLock | undefined = await lockRepository.findOne({key: data.uuid})
-            if (lock === undefined) {
-                lock = new RevivalLock();
-                lock.key = data.uuid;
-                lock.unlocked = false;
-                await getManager().save(lock);
-                response.send('test');
-            } else {
-                response.status(400).send('Lock already exists')
-            }
-        } catch (e) {
-            console.log(e);
-        }
-    });
-
 connectToDB().then(async () => {
     app.get('/unlocked', jsonParser, async (request, response) => {
         try {
@@ -156,12 +62,15 @@ connectToDB().then(async () => {
 
     app.post('/revived', jsonParser, async (request, response) => {
         const uuid = request.body.revival.key;
+        console.log(`Received a delete lock request for ${uuid}`);
         try {
             const lockRepository = getManager().getRepository(RevivalLock);
             let lock: RevivalLock | undefined = await lockRepository.findOne({key: uuid});
             if (lock === undefined) {
+                console.log(`No lock found for ${uuid} - this player may have already been unlocked and cleaned up`)
                 response.status(404).send("Player lock not found!");
             } else if (lock.unlocked) {
+                console.log(`Removing lock for ${uuid}`);
                 await lockRepository.remove(lock);
             }
         } catch (e) {
@@ -186,6 +95,7 @@ connectToDB().then(async () => {
             response.status(404).send("No donation id found");
             return;
         }
+        console.log(`Received a callback request from JustGiving! Donation id: ${donationid}, player key: ${key}`);
         const donationData = await util.promisify(fireGetJSONRequest)(`api.staging.justgiving.com`, `/${DC_JG_API_KEY}/v1/donation/${donationid}`);
         if (donationData && donationData.status && donationData.status.length > 0) {
             try {
@@ -194,10 +104,12 @@ connectToDB().then(async () => {
                     const status = donationData.status;
                     // We can also unlock now that the donation is accepted and hits the minimum value to avoid future calls.
                     if (status === "Accepted" || status === "Pending") {
+                        console.log(`Status is: ${status}! Proceeding to update player lock`);
                         const lockRepository = getManager().getRepository(RevivalLock);
                         let lock: RevivalLock | undefined = await lockRepository.findOne({key: key})
                         if (lock === undefined) {
                             //In the event of someone donating when no lock is present
+                            console.log(`No lock has been found - accepting donation regardless`);
                             response.redirect('/#/?status=success');
                             return;
                         } else if (!lock.unlocked) {
@@ -222,15 +134,18 @@ connectToDB().then(async () => {
                                 await donationRepository.save(donation);
                                 lock.donation = donation;
                                 lock.unlocked = true;
+                                console.log(`Unlocking lock for player key ${key}!`);
                                 await getManager().save(lock);
                                 response.redirect('/#/?status=success');
                                 return;
                             }
                         } else {
+                            console.log(`${key} has already been unlocked!`);
                             response.redirect('/#/?status=success');
                             return;
                         }
                     } else if (status === "Failed" || status === "Cancelled") {
+                        console.log(`JustGiving returned ${status} for donation ${donationid} and key ${key}`)
                         response.redirect(`/#/?status=error&key=${key}`);
                         return;
                     }

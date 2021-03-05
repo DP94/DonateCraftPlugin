@@ -2,14 +2,16 @@ import {getManager} from "typeorm";
 import {Player} from "../entities/player";
 import bodyParser from "body-parser";
 import {RevivalLock} from "../entities/RevivalLock";
+import {DeathDto} from "../dtos/death.dto";
+import {Death} from "../entities/death";
+import {Request, Response} from "express";
 
 const express = require('express');
 const router = express.Router();
 const jsonParser = bodyParser.json();
 
-// @ts-ignore
 //GET to see if a lock exists or not
-router.get('/:id', jsonParser, async (request, response, next) => {
+router.get('/lock/:id', jsonParser, async (request: Request, response: Response) => {
     const key = request.params.id;
     if (key === undefined) {
         return;
@@ -24,23 +26,26 @@ router.get('/:id', jsonParser, async (request, response, next) => {
     return;
 });
 
-
-//@ts-ignore
-router.post('/', jsonParser, async (request, response) => {
-    const data: Player = request.body.death;
+router.post('/lock', jsonParser, async (request: Request, response: Response) => {
+    const data: DeathDto = request.body.death;
     // Register key into DB
     try {
         try {
-            const deathRepository = getManager().getRepository(Player);
-            let death: Player | undefined = await deathRepository.findOne({uuid: data.uuid})
-            if (death === undefined) {
-                death = new Player();
-                death.uuid = data.uuid;
+            console.log(`Death received for ${data.uuid}! Creating death data`);
+            const playerRepository = getManager().getRepository(Player);
+            let player: Player | undefined = await playerRepository.findOne({uuid: data.uuid})
+            if (player === undefined) {
+                player = new Player();
+                player.uuid = data.uuid;
             }
-            death.name = data.name;
-            death.lastdeathreason = data.lastdeathreason;
-            death.deathcount++;
-            await getManager().save(death);
+            player.name = data.name;
+            const death = new Death();
+            death.reason = data.reason;
+            death.date = new Date();
+            death.player = player;
+            player.deaths?.push(death);
+            await getManager().save(player);
+            console.log(`Successfully recorded death for ${data.uuid}`);
         } catch (e) {
             console.log('Encountered issue when trying to persist user stats!');
             console.log(e);
@@ -49,11 +54,12 @@ router.post('/', jsonParser, async (request, response) => {
         const lockRepository = getManager().getRepository(RevivalLock);
         let lock: RevivalLock | undefined = await lockRepository.findOne({key: data.uuid})
         if (lock === undefined) {
+            console.log(`Creating a new lock for ${data.uuid}`);
             lock = new RevivalLock();
             lock.key = data.uuid;
             lock.unlocked = false;
             await getManager().save(lock);
-            response.send('test');
+            console.log(`Successfully created lock for ${data.uuid}`);
         } else {
             response.status(400).send('Lock already exists')
         }

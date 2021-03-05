@@ -4,7 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vypersw.network.HttpHelper;
 import com.vypersw.response.Revival;
 import org.bukkit.*;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -75,13 +78,22 @@ public class ReanimationProtocol implements Runnable {
             } else {
                 player.teleport(player.getBedSpawnLocation());
             }
-            currentPlayerWorld.strikeLightningEffect(player.getLocation());
-            currentPlayerWorld.playEffect(player.getLocation(), Effect.SMOKE, 0, 100);
-            server.broadcastMessage(ChatColor.GOLD + player.getName() + " " + ChatColor.GREEN + "has been revived!");
             player.setGameMode(GameMode.SURVIVAL);
+            currentPlayerWorld.strikeLightningEffect(player.getLocation());
+            currentPlayerWorld.playEffect(player.getLocation(), Effect.DRAGON_BREATH, 0);
+            currentPlayerWorld.spawnEntity(player.getLocation(), EntityType.FIREWORK);
+            addRespawnPotionEffects(player);
+            server.broadcastMessage(ChatColor.GOLD + player.getName() + " " + ChatColor.GREEN + "has been revived!");
             httpHelper.fireAsyncPostRequestToServer("/revived", revival);
         } else if (player != null && player.isOnline() && !player.isDead()) {
             httpHelper.fireAsyncPostRequestToServer("/revived", revival);
         }
+    }
+
+    public void addRespawnPotionEffects(Player player) {
+        player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 200, 100, true, true));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 200, 10, true, true));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.HEAL, 200, 10, true, true));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 200, 10, true, true));
     }
 }

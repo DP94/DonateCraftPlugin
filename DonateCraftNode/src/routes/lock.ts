@@ -48,8 +48,7 @@ router.post('/', jsonParser, async (request: Request, response: Response) => {
             console.log(`Successfully recorded death for ${data.uuid}`);
             response.sendStatus(200);
         } catch (e) {
-            console.log('Encountered issue when trying to persist user stats!');
-            console.log(e);
+            console.log(`Encountered issue when trying to persist user stats! ${e}`);
         }
 
         const lockRepository = getManager().getRepository(RevivalLock);

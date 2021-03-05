@@ -7,6 +7,8 @@ import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,12 +44,21 @@ public class ReanimationProtocolTest {
     private ReanimationProtocol reanimationProtocol;
     private UUID uuid;
 
+    private PotionEffect glowing;
+    private PotionEffect regen;
+    private PotionEffect heal;
+    private PotionEffect damageResistance;
+
     @Before
     public void before() {
         reanimationProtocol = new ReanimationProtocol(server, messageHelper, httpHelper);
         uuid = UUID.randomUUID();
         when(server.getLogger()).thenReturn(logger);
         when(server.getPlayer(uuid)).thenReturn(player);
+        glowing = new PotionEffect(PotionEffectType.GLOWING, 200, 100, true, true);
+        regen = new PotionEffect(PotionEffectType.REGENERATION, 200, 10, true, true);
+        heal = new PotionEffect(PotionEffectType.HEAL, 200, 10, true, true);
+        damageResistance = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 200, 10, true, true);
     }
 
     @Test
@@ -105,5 +116,27 @@ public class ReanimationProtocolTest {
         when(player.isDead()).thenReturn(false);
         reanimationProtocol.reanimatePlayer(uuid);
         verify(httpHelper).fireAsyncPostRequestToServer("/revived", revival);
+    }
+
+    @Test
+    public void testThatPlayerWhoIsRevivedHasPotionsApplied() {
+        when(player.isOnline()).thenReturn(true);
+        when(player.isDead()).thenReturn(true);
+        when(player.getWorld()).thenReturn(world);
+        reanimationProtocol.reanimatePlayer(uuid);
+        runPotionVerification();
+    }
+
+    @Test
+    public void testThatAddRespawnEffectsAppliesCorrectPotions() {
+        reanimationProtocol.addRespawnPotionEffects(player);
+        runPotionVerification();
+    }
+
+    private void runPotionVerification() {
+        verify(player).addPotionEffect(glowing);
+        verify(player).addPotionEffect(regen);
+        verify(player).addPotionEffect(heal);
+        verify(player).addPotionEffect(damageResistance);
     }
 }

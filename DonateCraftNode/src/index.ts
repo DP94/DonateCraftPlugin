@@ -61,12 +61,15 @@ connectToDB().then(async () => {
 
     app.post('/revived', jsonParser, async (request, response) => {
         const uuid = request.body.revival.key;
+        console.log(`Received a delete lock request for ${uuid}`);
         try {
             const lockRepository = getManager().getRepository(RevivalLock);
             let lock: RevivalLock | undefined = await lockRepository.findOne({key: uuid});
             if (lock === undefined) {
+                console.log(`No lock found for ${uuid} - this player may have already been unlocked and cleaned up`)
                 response.status(404).send("Player lock not found!");
             } else if (lock.unlocked) {
+                console.log(`Removing lock for ${uuid}`);
                 await lockRepository.remove(lock);
             }
         } catch (e) {
@@ -91,6 +94,7 @@ connectToDB().then(async () => {
             response.status(404).send("No donation id found");
             return;
         }
+        console.log(`Received a callback request from JustGiving! Donation id: ${donationid}, player key: ${key}`);
         const donationData = await util.promisify(fireGetJSONRequest)(`api.staging.justgiving.com`, `/${DC_JG_API_KEY}/v1/donation/${donationid}`);
         if (donationData && donationData.status && donationData.status.length > 0) {
             try {
@@ -99,10 +103,12 @@ connectToDB().then(async () => {
                     const status = donationData.status;
                     // We can also unlock now that the donation is accepted and hits the minimum value to avoid future calls.
                     if (status === "Accepted" || status === "Pending") {
+                        console.log(`Status is: ${status}! Proceeding to update player lock`);
                         const lockRepository = getManager().getRepository(RevivalLock);
                         let lock: RevivalLock | undefined = await lockRepository.findOne({key: key})
                         if (lock === undefined) {
                             //In the event of someone donating when no lock is present
+                            console.log(`No lock has been found - accepting donation regardless`);
                             response.redirect('/#/?status=success');
                             return;
                         } else if (!lock.unlocked) {
@@ -120,14 +126,17 @@ connectToDB().then(async () => {
                             await donationRepository.save(donation);
                             lock.donation = donation;
                             lock.unlocked = true;
+                            console.log(`Unlocking lock for player key ${key}!`);
                             await getManager().save(lock);
                             response.redirect('/#/?status=success');
                             return;
                         } else {
+                            console.log(`${key} has already been unlocked!`);
                             response.redirect('/#/?status=success');
                             return;
                         }
                     } else if (status === "Failed" || status === "Cancelled") {
+                        console.log(`JustGiving returned ${status} for donation ${donationid} and key ${key}`)
                         response.redirect(`/#/?status=error&key=${key}`);
                         return;
                     }

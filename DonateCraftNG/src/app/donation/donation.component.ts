@@ -32,7 +32,7 @@ export class DonationComponent implements AfterViewInit {
 
     // For some reason Race Equality First does not exist in staging
     if (environment.production) {
-      this.charityIds.push(2979600);
+      this.charityIds.push(2979600, 2536613);
     }
 
     this.setPlayerKeyFromURL(this.activatedRoute);

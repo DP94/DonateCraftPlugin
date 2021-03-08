@@ -113,7 +113,7 @@ public class VoteCommandsTest {
     @Test
     public void testThatAnswerCommandWithInvalidValueReturnsCorrectMessage() {
         voteCommands.onCommand(playerCommandSender, command, "vote", new String[] {"answer", "invalid"});
-        verify(playerCommandSender).sendMessage("§cinvalid§f is not a valid input. Try YES or NO");
+        verify(playerCommandSender).sendMessage("§cinvalid§f is not a valid input. Try §aYES§f or §cNO");
     }
 
     @Test
@@ -157,7 +157,17 @@ public class VoteCommandsTest {
         //Second player votes, but this time with just /vote yes
         voteCommands.onCommand(secondPlayer, command, "vote", new String[] {"yes"});
         verify(server).broadcastMessage("§6Test2§f just voted!");
-        verify(server).broadcastMessage("All players have voted! The result is §6YES!");
+        verify(server).broadcastMessage("All players have voted! The result is §aYES!");
+        verify(server).broadcastMessage("The vote has now ended.");
+    }
+
+    @Test
+    public void testThatNoConsensusIsInRed() {
+        doReturn(Collections.singletonList(playerCommandSender)).when(server).getOnlinePlayers();
+        voteCommands.onCommand(playerCommandSender, command, "vote", new String[] {"ask", "Testing a vote"});
+        voteCommands.onCommand(playerCommandSender, command, "vote", new String[] {"answer", "no"});
+        verify(server).broadcastMessage("§6Test§f just voted!");
+        verify(server).broadcastMessage("All players have voted! The result is §cNO!");
         verify(server).broadcastMessage("The vote has now ended.");
     }
 

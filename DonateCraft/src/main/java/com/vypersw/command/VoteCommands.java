@@ -77,15 +77,22 @@ public class VoteCommands implements CommandExecutor {
     private void processAnswer(String answer, VoteManager voteManager, Player commandSender) {
         VoteRecord record = getVoteRecordForInput(answer);
         if (record == null) {
-            commandSender.sendMessage(ChatColor.RED + answer + ChatColor.WHITE + " is not a valid input. Try YES or " +
-                    "NO");
+            commandSender.sendMessage(ChatColor.RED + answer + ChatColor.WHITE + " is not a valid input. Try " + ChatColor.GREEN +
+                    "YES" + ChatColor.WHITE + " or " + ChatColor.RED +  "NO");
         } else if (voteManager.isVoteActive()) {
-            voteManager.answer(commandSender, VoteRecord.valueOf(answer.toUpperCase()));
+            voteManager.answer(commandSender, record);
             Score score = scores.get(commandSender);
             score.setScore(1);
             server.broadcastMessage(ChatColor.GOLD + commandSender.getName() + ChatColor.WHITE + " just voted!");
             if (voteManager.isVoteFinished(server.getOnlinePlayers().size())) {
-                server.broadcastMessage("All players have voted! The result is " + ChatColor.GOLD + voteManager.calculateWinningVote() + "!");
+                VoteRecord result = voteManager.calculateWinningVote();
+                ChatColor color = ChatColor.WHITE;
+                if (result == VoteRecord.YES) {
+                    color = ChatColor.GREEN;
+                } else if (result == VoteRecord.NO) {
+                    color = ChatColor.RED;
+                }
+                server.broadcastMessage("All players have voted! The result is " + color + voteManager.calculateWinningVote() + "!");
                 server.broadcastMessage("The vote has now ended.");
                 voteManager.end();
                 for (Player player : server.getOnlinePlayers()) {

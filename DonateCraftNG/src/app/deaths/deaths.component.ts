@@ -50,12 +50,12 @@ export class DeathsComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
 
-  getTotalDonationsForPlayer(donations: Donation[]): number {
+  getTotalDonationsForPlayer(donations: Donation[]): string {
     let total = 0;
     for (const donation of donations) {
       total += donation.amount;
     }
-    return total;
+    return total.toFixed(2);
   }
 
   getMostRecentDeathForUser(deaths: Death[]): string {

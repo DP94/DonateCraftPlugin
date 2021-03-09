@@ -1,8 +1,12 @@
 package com.vypersw;
 
 import com.vypersw.vote.Vote;
+import com.vypersw.vote.VoteAnswer;
 import com.vypersw.vote.VoteRecord;
 import org.bukkit.entity.Player;
+
+import java.util.Date;
+import java.util.UUID;
 
 public class VoteManager {
 
@@ -14,35 +18,34 @@ public class VoteManager {
     }
 
     public boolean isVoteFinished(int totalOnlinePlayers) {
-        return totalOnlinePlayers == activeVote.getVoteRecords().size();
+        return activeVote.getVoteRecords().size() >= totalOnlinePlayers;
     }
 
-    public VoteRecord calculateWinningVote() {
-        long yesCount = activeVote.getVoteRecords().values().stream().filter(v -> v == VoteRecord.YES).count();
-        long noCount = activeVote.getVoteRecords().values().stream().filter(v -> v == VoteRecord.NO).count();
+    public VoteAnswer calculateWinningVote() {
+        long yesCount = activeVote.getVoteRecords().stream().filter(v -> v.getDecision() == VoteAnswer.YES).count();
+        long noCount = activeVote.getVoteRecords().stream().filter(v -> v.getDecision() == VoteAnswer.NO).count();
         if (yesCount > noCount) {
-            return VoteRecord.YES;
+            return VoteAnswer.YES;
         } else if (noCount > yesCount) {
-            return VoteRecord.NO;
+            return VoteAnswer.NO;
         } else {
-            return VoteRecord.TIE;
+            return VoteAnswer.TIE;
         }
     }
 
     public void end() {
-        if (activeVote != null) {
-            activeVote.setHasFinished(true);
-        }
         activeVote = null;
     }
 
-    public void startVote(String question, Player author) {
+    public void startVote(String question, UUID author) {
         activeVote = new Vote(question, author);
     }
 
-    public void answer(Player voter, VoteRecord voteRecord) {
+    public void answer(Player voter, VoteAnswer voteAnswer) {
         if (activeVote != null) {
-            activeVote.getVoteRecords().put(voter, voteRecord);
+            VoteRecord voteRecord = new VoteRecord(voter.getUniqueId(), voteAnswer);
+            voteRecord.setTimeVoted(new Date());
+            activeVote.getVoteRecords().add(voteRecord);
         }
     }
 

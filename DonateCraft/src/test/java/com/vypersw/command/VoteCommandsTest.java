@@ -1,5 +1,7 @@
 package com.vypersw.command;
 
+import com.vypersw.network.HttpHelper;
+import com.vypersw.vote.VoteAnswer;
 import com.vypersw.vote.VoteRecord;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
@@ -48,11 +50,14 @@ public class VoteCommandsTest {
     @Mock
     private Score score;
 
+    @Mock
+    private HttpHelper httpHelper;
+
     private VoteCommands voteCommands;
 
     @Before
     public void before() {
-        voteCommands = new VoteCommands(server);
+        voteCommands = new VoteCommands(server, httpHelper);
         when(server.getScoreboardManager()).thenReturn(scoreboardManager);
         when(scoreboardManager.getNewScoreboard()).thenReturn(scoreboard);
         when(scoreboard.registerNewObjective(anyString(), anyString(), anyString())).thenReturn(objective);
@@ -89,16 +94,16 @@ public class VoteCommandsTest {
     public void testThatASKStartsVoteIfNoVoteActive() {
         voteCommands.onCommand(playerCommandSender, command, "vote", new String[] {"ask", "Testing a vote"});
         voteCommands.onCommand(playerCommandSender, command, "vote", new String[] {"end"});
-        verify(server).broadcastMessage("§6Test§f has started a vote! §6Testing a vote ");
+        verify(server).broadcastMessage("§6Test§f has started a vote! §6Testing a vote");
     }
 
     @Test
     public void testThatScoreboardIsSetupWhenNoVoteActive() {
         doReturn(Collections.singletonList(playerCommandSender)).when(server).getOnlinePlayers();
         voteCommands.onCommand(playerCommandSender, command, "vote", new String[] {"ask", "Testing a vote"});
-        verify(server).broadcastMessage("§6Test§f has started a vote! §6Testing a vote ");
+        verify(server).broadcastMessage("§6Test§f has started a vote! §6Testing a vote");
         verify(objective).setDisplaySlot(DisplaySlot.SIDEBAR);
-        verify(objective).setDisplayName("§6Testing a vote ");
+        verify(objective).setDisplayName("§6Testing a vote");
         verify(objective).getScore(playerCommandSender.getName());
         verify(playerCommandSender).setScoreboard(scoreboard);
     }
@@ -203,47 +208,47 @@ public class VoteCommandsTest {
 
     @Test
     public void testThat1IsRecognisedAsYES() {
-        assertEquals(VoteRecord.YES, voteCommands.getVoteRecordForInput("1"));
+        assertEquals(VoteAnswer.YES, voteCommands.getVoteRecordForInput("1"));
     }
 
     @Test
     public void testThatYesIsRecognisedAsYES() {
-        assertEquals(VoteRecord.YES, voteCommands.getVoteRecordForInput("yes"));
+        assertEquals(VoteAnswer.YES, voteCommands.getVoteRecordForInput("yes"));
     }
 
     @Test
     public void testThatYeIsRecognisedAsYES() {
-        assertEquals(VoteRecord.YES, voteCommands.getVoteRecordForInput("ye"));
+        assertEquals(VoteAnswer.YES, voteCommands.getVoteRecordForInput("ye"));
     }
 
     @Test
     public void testThatYIsRecognisedAsYES() {
-        assertEquals(VoteRecord.YES, voteCommands.getVoteRecordForInput("y"));
+        assertEquals(VoteAnswer.YES, voteCommands.getVoteRecordForInput("y"));
     }
 
     @Test
     public void testThatTrueIsRecognisedAsYES() {
-        assertEquals(VoteRecord.YES, voteCommands.getVoteRecordForInput("true"));
+        assertEquals(VoteAnswer.YES, voteCommands.getVoteRecordForInput("true"));
     }
 
     @Test
     public void testThat0IsRecognisedAsNO() {
-        assertEquals(VoteRecord.NO, voteCommands.getVoteRecordForInput("0"));
+        assertEquals(VoteAnswer.NO, voteCommands.getVoteRecordForInput("0"));
     }
 
     @Test
     public void testThatNoIsRecognisedAsNO() {
-        assertEquals(VoteRecord.NO, voteCommands.getVoteRecordForInput("no"));
+        assertEquals(VoteAnswer.NO, voteCommands.getVoteRecordForInput("no"));
     }
 
     @Test
     public void testThatNIsRecognisedAsNO() {
-        assertEquals(VoteRecord.NO, voteCommands.getVoteRecordForInput("n"));
+        assertEquals(VoteAnswer.NO, voteCommands.getVoteRecordForInput("n"));
     }
 
     @Test
     public void testThatFalseIsRecognisedAsNO() {
-        assertEquals(VoteRecord.NO, voteCommands.getVoteRecordForInput("false"));
+        assertEquals(VoteAnswer.NO, voteCommands.getVoteRecordForInput("false"));
     }
 
     @Test

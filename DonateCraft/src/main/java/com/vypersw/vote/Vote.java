@@ -1,25 +1,31 @@
 package com.vypersw.vote;
 
-import org.bukkit.entity.Player;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonRootName;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
+@JsonRootName(value = "vote")
 public class Vote {
 
     private String question;
-    private Player author;
-    private boolean hasStarted;
-    private boolean hasFinished;
-    private final Map<Player, VoteRecord> voteRecords;
+    private UUID author;
 
-    public Vote(String question, Player author) {
-        voteRecords = new HashMap<>();
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    private Date dateCalled;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    private Date dateFinished;
+    private final Set<VoteRecord> voteRecords;
+
+    public Vote(String question, UUID author) {
+        voteRecords = new HashSet<>();
         this.question = question;
         this.author = author;
+        this.dateCalled = new Date();
     }
 
-    public Map<Player, VoteRecord> getVoteRecords() {
+    public Set<VoteRecord> getVoteRecords() {
         return voteRecords;
     }
 
@@ -31,28 +37,32 @@ public class Vote {
         this.question = question;
     }
 
-    public Player getAuthor() {
+    public UUID getAuthor() {
         return author;
     }
 
-    public void setAuthor(Player author) {
+    public void setAuthor(UUID author) {
         this.author = author;
     }
 
-    public boolean isHasStarted() {
-        return hasStarted;
+    public Date getDateCalled() {
+        return dateCalled;
     }
 
-    public void setHasStarted(boolean hasStarted) {
-        this.hasStarted = hasStarted;
+    public void setDateCalled(Date dateCalled) {
+        this.dateCalled = dateCalled;
     }
 
-    public boolean isHasFinished() {
-        return hasFinished;
+    public Date getDateFinished() {
+        return dateFinished;
     }
 
-    public void setHasFinished(boolean hasFinished) {
-        this.hasFinished = hasFinished;
-        this.hasStarted = !hasFinished;
+    public void setDateFinished(Date dateFinished) {
+        this.dateFinished = dateFinished;
+    }
+
+    public VoteRecord findByUUID(UUID uuid) {
+        Optional<VoteRecord> voteRecord = voteRecords.stream().filter(v -> v.getVoter().equals(uuid)).findFirst();
+        return voteRecord.orElse(null);
     }
 }

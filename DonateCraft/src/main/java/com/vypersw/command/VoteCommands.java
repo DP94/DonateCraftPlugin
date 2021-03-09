@@ -1,7 +1,8 @@
 package com.vypersw.command;
 
 import com.vypersw.VoteManager;
-import com.vypersw.vote.VoteRecord;
+import com.vypersw.network.HttpHelper;
+import com.vypersw.vote.VoteAnswer;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
@@ -11,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,8 +27,11 @@ public class VoteCommands implements CommandExecutor {
     private final String ANSWER = "answer";
     private final String END = "end";
 
-    public VoteCommands(Server server) {
+    private final HttpHelper httpHelper;
+
+    public VoteCommands(Server server, HttpHelper httpHelper) {
         this.server = server;
+        this.httpHelper = httpHelper;
     }
 
     @Override
@@ -63,10 +68,12 @@ public class VoteCommands implements CommandExecutor {
         StringBuilder question = new StringBuilder();
         for (int i = 1; i < args.length; i++) {
             question.append(args[i]);
-            question.append(" ");
+            if (i != args.length - 1) {
+                question.append(" ");
+            }
         }
         if (!voteManager.isVoteActive()) {
-            voteManager.startVote(question.toString(), commandSender);
+            voteManager.startVote(question.toString(), commandSender.getUniqueId());
             createScoreboardForVote(question.toString(), server.getOnlinePlayers());
             server.broadcastMessage(ChatColor.GOLD + commandSender.getName() + ChatColor.WHITE + " has started a vote! " + ChatColor.GOLD + question.toString());
         } else {
@@ -75,7 +82,7 @@ public class VoteCommands implements CommandExecutor {
     }
 
     private void processAnswer(String answer, VoteManager voteManager, Player commandSender) {
-        VoteRecord record = getVoteRecordForInput(answer);
+        VoteAnswer record = getVoteRecordForInput(answer);
         if (record == null) {
             commandSender.sendMessage(ChatColor.RED + answer + ChatColor.WHITE + " is not a valid input. Try " + ChatColor.GREEN +
                     "YES" + ChatColor.WHITE + " or " + ChatColor.RED +  "NO");
@@ -85,15 +92,17 @@ public class VoteCommands implements CommandExecutor {
             score.setScore(1);
             server.broadcastMessage(ChatColor.GOLD + commandSender.getName() + ChatColor.WHITE + " just voted!");
             if (voteManager.isVoteFinished(server.getOnlinePlayers().size())) {
-                VoteRecord result = voteManager.calculateWinningVote();
+                VoteAnswer result = voteManager.calculateWinningVote();
                 ChatColor color = ChatColor.WHITE;
-                if (result == VoteRecord.YES) {
+                if (result == VoteAnswer.YES) {
                     color = ChatColor.GREEN;
-                } else if (result == VoteRecord.NO) {
+                } else if (result == VoteAnswer.NO) {
                     color = ChatColor.RED;
                 }
                 server.broadcastMessage("All players have voted! The result is " + color + voteManager.calculateWinningVote() + "!");
                 server.broadcastMessage("The vote has now ended.");
+                voteManager.getActiveVote().setDateFinished(new Date());
+                httpHelper.fireAsyncPostRequestToServer("/vote", voteManager.getActiveVote());
                 voteManager.end();
                 for (Player player : server.getOnlinePlayers()) {
                     player.setScoreboard(server.getScoreboardManager().getNewScoreboard());
@@ -105,7 +114,9 @@ public class VoteCommands implements CommandExecutor {
     }
 
     private void processEnd(VoteManager voteManager, Player commandSender) {
-        if (voteManager.isVoteActive() && voteManager.getActiveVote().getAuthor().getUniqueId().equals(commandSender.getUniqueId())) {
+        if (voteManager.isVoteActive() && voteManager.getActiveVote().getAuthor().equals(commandSender.getUniqueId())) {
+            voteManager.getActiveVote().setDateFinished(new Date());
+            httpHelper.fireAsyncPostRequestToServer("/vote", voteManager.getActiveVote());
             voteManager.end();
             for (Player player : server.getOnlinePlayers()) {
                 player.setScoreboard(server.getScoreboardManager().getNewScoreboard());
@@ -133,7 +144,7 @@ public class VoteCommands implements CommandExecutor {
         }
     }
 
-    public VoteRecord getVoteRecordForInput(String input) {
+    public VoteAnswer getVoteRecordForInput(String input) {
         if (input == null) {
             return null;
         }
@@ -143,12 +154,12 @@ public class VoteCommands implements CommandExecutor {
             case "ye":
             case "y":
             case "true":
-                return VoteRecord.YES;
+                return VoteAnswer.YES;
             case "0":
             case "no":
             case "n":
             case "false":
-                return VoteRecord.NO;
+                return VoteAnswer.NO;
             default:
                 return null;
         }

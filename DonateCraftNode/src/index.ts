@@ -8,6 +8,8 @@ import http from 'http';
 import {RevivalsDto} from "./dtos/revivals.dto";
 import {Donation} from "./entities/donation";
 import {Death} from "./entities/death";
+import {Vote} from "./entities/vote";
+import {VoteRecord} from "./entities/vote.record";
 
 const util = require('util')
 require('dotenv').config()
@@ -31,6 +33,7 @@ if (!DC_JG_API_KEY) {
 const index = require('./routes/index.route');
 const players = require('./routes/players');
 const lock = require('./routes/lock')
+const vote = require('./routes/vote');
 
 const app = express();
 app.use(cors());
@@ -40,6 +43,7 @@ app.use(jsonParser);
 app.use('/', index);
 app.use('/players', players);
 app.use('/lock', lock);
+app.use('/vote', vote);
 app.use(express.static(process.cwd() + "/build/public/"));
 
 app.listen(PORT, () => {
@@ -96,7 +100,7 @@ connectToDB().then(async () => {
             return;
         }
         console.log(`Received a callback request from JustGiving! Donation id: ${donationid}, player key: ${key}`);
-        const donationData = await util.promisify(fireGetJSONRequest)(`api.staging.justgiving.com`, `/${DC_JG_API_KEY}/v1/donation/${donationid}`);
+        const donationData = await util.promisify(fireGetJSONRequest)(`api.justgiving.com`, `/${DC_JG_API_KEY}/v1/donation/${donationid}`);
         if (donationData && donationData.status && donationData.status.length > 0) {
             try {
                 // If data is returned and we have a status
@@ -127,7 +131,7 @@ connectToDB().then(async () => {
                                 donation.charity = donationData.charityId;
                                 donation.player = player;
 
-                                const charityData = await util.promisify(fireGetJSONRequest)('api.staging.justgiving.com', `/${DC_JG_API_KEY}/v1/charity/${donation.charity}`);
+                                const charityData = await util.promisify(fireGetJSONRequest)('api.justgiving.com', `/${DC_JG_API_KEY}/v1/charity/${donation.charity}`);
                                 donation.charityName = charityData.name;
                                 donation.date = new Date();
 
@@ -196,7 +200,7 @@ function connectToDB() {
         password: DC_DB_PASSWORD,
         database: "donatecraft",
         entities: [
-            Player, Donation, RevivalLock, Death
+            Player, Donation, RevivalLock, Death, Vote, VoteRecord
         ],
         synchronize: true,
         logging: false,

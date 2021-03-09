@@ -3,11 +3,11 @@
     <tbody class="h-100">
     <tr *ngFor="let charity of charities" class="charity-row h-100">
       <td class="h-100 charity-image-td">
-        <div class="charity-image h-100">
+        <div class="charity-image">
           <img src="{{charity.logoAbsoluteUrl}}" class="charity-image"
                alt="Could not load image, has the charity set one?"/>
         </div>
-      <td>
+      <td class="charity-info-td">
         <div class="charity-info-wrapper">
           <span class="charity-info charity-name">{{ charity.name }}</span>
           <span class="charity-info charity-description"> {{ charity.description }}</span>

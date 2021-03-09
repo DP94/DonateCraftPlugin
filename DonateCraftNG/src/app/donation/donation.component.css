@@ -12,6 +12,11 @@ tr:last-child {
   flex-direction: column;
 }
 
+.charity-info-td {
+  vertical-align: middle;
+  justify-content: center;
+}
+
 .charity-image {
   text-align: center;
 }

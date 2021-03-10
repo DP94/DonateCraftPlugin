@@ -29,11 +29,11 @@
 </ng-template>
 
 <ng-template #donateContent let-modal>
-  <div class="modal-header donate-header">Who is donating?</div>
-  <div class="modal-body donate-body">
+  <div class="modal-header donate-header">Who is donating?
     <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
       <span aria-hidden="true">&times;</span>
-    </button>
+    </button></div>
+  <div class="modal-body donate-body">
     <div class="player-choice">
       <ul class="w-100">
         <li *ngFor="let player of players" class="player-record w-100" (click)="onDonatePlayerClick(modal, player.uuid)">

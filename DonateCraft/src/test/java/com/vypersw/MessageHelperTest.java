@@ -1,5 +1,6 @@
 package com.vypersw;
 
+import com.vypersw.response.DCPlayer;
 import com.vypersw.response.Donation;
 import com.vypersw.response.Revival;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -99,6 +100,15 @@ public class MessageHelperTest {
         String result = messageHelper.getDonationMessageFromRevival(player, revival);
         //§ is inserted by ChatColor.COLOR, i.e. ChatColor.WHITE is §f
         String expected = "§6Test§f just donated§a £100.99§f to §6Test charity§f! They will be revived shortly (if they are online)";
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void testThatDonationFromAnotherPlayerProducesCorrectMessage() {
+        donation.setAmount(10.00);
+        donation.setPaidForBy(new DCPlayer(UUID.randomUUID(), "Test2"));
+        String result = messageHelper.getDonationMessageFromRevival(player, revival);
+        String expected = "§6Test2§f just donated§a £10.00§f on behalf of §6Test§f to §6Test charity§f! They will be revived shortly (if they are online)";
         assertEquals(expected, result);
     }
 

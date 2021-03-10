@@ -5,6 +5,7 @@ import {RevivalLock} from "../entities/RevivalLock";
 import {DeathDto} from "../dtos/death.dto";
 import {Death} from "../entities/death";
 import {Request, Response} from "express";
+import {RevivalsDto} from "../dtos/revivals.dto";
 
 const express = require('express');
 const router = express.Router();
@@ -24,6 +25,14 @@ router.get('/:id', jsonParser, async (request: Request, response: Response) => {
         response.end(JSON.stringify(true));
     }
     return;
+});
+
+router.get('/', jsonParser, async (request: Request, response: Response) => {
+    const revivalRepository = getManager().getRepository(RevivalLock);
+    const locks: RevivalLock[] = await revivalRepository.find();
+    const revivalDTO: RevivalsDto = new RevivalsDto(locks);
+    response.setHeader('Content-Type', 'application/json');
+    response.end(JSON.stringify(revivalDTO));
 });
 
 router.post('/', jsonParser, async (request: Request, response: Response) => {

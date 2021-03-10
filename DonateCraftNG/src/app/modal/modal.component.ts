@@ -1,56 +1,24 @@
 import {Component, ViewChild, ViewEncapsulation} from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import {environment} from '../../environments/environment';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Router} from '@angular/router';
+import {Player} from '../response/player';
 
 @Component({
   selector: 'app-modal',
   templateUrl: './modal-options.html',
   encapsulation: ViewEncapsulation.None,
-  styles: [`
-    .modal-content {
-      background: none;
-      border: none;
-    }
-
-    .modal-content, .modal-body {
-      border-radius: 3%;
-      text-align: center;
-      font-size: 20px;
-    }
-
-    .modal-backdrop {
-      background-color: #d4d4d4;
-    }
-
-    .success-modal {
-      background-color: #9be69b;
-    }
-
-    .error-modal {
-      background-color: #ef6b6b;
-    }
-
-    .warning-modal {
-      background-color: #ffc107;
-    }
-
-    .error-try-again {
-      color: black;
-      font-weight: bold;
-      text-decoration: underline;
-      cursor: pointer;
-    }
-  `]
+  styleUrls: ['modal-options.css']
 })
 export class ModalComponent {
 
   @ViewChild('successContent') successContent;
   @ViewChild('errorContent') errorContent;
   @ViewChild('warningContent') warningContent;
+  @ViewChild('donateContent') donateContent;
 
   key: string;
   modalBody: string;
+  players: Player[];
 
   constructor(private modalService: NgbModal, private router: Router) {}
 
@@ -71,8 +39,25 @@ export class ModalComponent {
     this.modalService.open(this.errorContent);
   }
 
+  showDonateModal(deadPlayerKey: string, players: Player[]): void {
+    this.players = players;
+    this.key = deadPlayerKey;
+    this.modalService.open(this.donateContent);
+  }
+
   onErrorTryAgainClick(modal): void {
     modal.dismiss();
     this.router.navigate(['/donate', {key: this.key}]);
+  }
+
+  onDonatePlayerClick(modal, donor): void {
+    modal.dismiss();
+    let options = {};
+    if (this.key !== donor) {
+      options = {key: this.key, donorKey: donor};
+    } else {
+      options = {key: this.key};
+    }
+    this.router.navigate(['/donate', options]);
   }
 }

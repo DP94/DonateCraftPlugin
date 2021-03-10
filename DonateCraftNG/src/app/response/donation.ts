@@ -5,4 +5,5 @@ export class Donation {
   uuid: string;
   date: Date;
   charity: number;
+  paidForBy;
 }

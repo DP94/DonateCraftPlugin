@@ -33,22 +33,40 @@ public class MessageHelper {
 
     public String getDonationMessageFromRevival(Player player, Revival revival) {
         StringBuilder builder = new StringBuilder();
-        builder.append(ChatColor.GOLD)
-                .append(player.getName())
-                .append(ChatColor.WHITE)
-                .append(" just donated");
 
-        if (!revival.getDonation().isPrivate()) {
-            builder.append(ChatColor.GREEN);
-            builder.append(" £");
-            builder.append(donationAmountFormat.format(revival.getDonation().getAmount()));
+        builder.append(ChatColor.GOLD);
+
+        if (revival.getDonation().getPaidForBy() != null) {
+             builder.append(revival.getDonation().getPaidForBy().getName())
+                    .append(ChatColor.WHITE)
+                    .append(" just donated")
+                    .append(getDonationAmountMessage(revival))
+                     .append(ChatColor.WHITE)
+                     .append(" on behalf of ")
+                    .append(ChatColor.GOLD)
+                    .append(player.getName());
+        } else {
+              builder.append(player.getName())
+                     .append(ChatColor.WHITE)
+                     .append(" just donated")
+                     .append(getDonationAmountMessage(revival));
         }
-        builder.append(ChatColor.WHITE)
+         builder.append(ChatColor.WHITE)
                 .append(" to ")
                 .append(ChatColor.GOLD)
                 .append(revival.getDonation().getCharityName())
                 .append(ChatColor.WHITE)
                 .append("! They will be revived shortly (if they are online)");
+        return builder.toString();
+    }
+
+    private String getDonationAmountMessage(Revival revival) {
+        StringBuilder builder = new StringBuilder();
+        if (!revival.getDonation().isPrivate()) {
+            builder.append(ChatColor.GREEN);
+            builder.append(" £");
+            builder.append(donationAmountFormat.format(revival.getDonation().getAmount()));
+        }
         return builder.toString();
     }
 }

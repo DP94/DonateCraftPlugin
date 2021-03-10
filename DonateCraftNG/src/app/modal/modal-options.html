@@ -27,3 +27,20 @@
     <p>If you decide to donate, nothing will happen in game; but the charity will still receive your donation!</p>
   </div>
 </ng-template>
+
+<ng-template #donateContent let-modal>
+  <div class="modal-header donate-header">Who is donating?</div>
+  <div class="modal-body donate-body">
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <div class="player-choice">
+      <ul>
+        <li *ngFor="let player of players" class="player-record" (click)="onDonatePlayerClick(modal, player.uuid)">
+          <img class="player-choice-image col-sm-1" src='https://crafatar.com/avatars/{{ player.uuid}}'/>
+          <span class="col-sm-2">{{player.name}}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</ng-template>

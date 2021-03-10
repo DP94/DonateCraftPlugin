@@ -19,6 +19,7 @@ router.get('/', jsonParser, async (request: Request, response: Response, next: N
         const players: Player[] = await playerRepository.createQueryBuilder('player')
             .leftJoinAndSelect('player.deaths', 'deaths')
             .leftJoinAndSelect('player.donations', 'donations')
+            .leftJoinAndSelect('donations.paidForBy', 'paidForBy')
             .andWhereInIds(ids).orderBy(getPlayerIdsSortedString(ids)).getMany();
         const playersDTO: PlayersDto = new PlayersDto();
         playersDTO.players = players;

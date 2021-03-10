@@ -1,0 +1,71 @@
+.modal-content {
+  background: none;
+  border: none;
+}
+
+.modal-content, .modal-body {
+  border-radius: 3%;
+  text-align: center;
+  font-size: 20px;
+}
+
+.modal-backdrop {
+  background-color: #d4d4d4;
+}
+
+.success-modal {
+  background-color: #9be69b;
+}
+
+.error-modal {
+  background-color: #ef6b6b;
+}
+
+.warning-modal {
+  background-color: #ffc107;
+}
+
+.donate-body, .donate-header  {
+  background-color: white;
+  border-radius: 0;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+}
+
+.donate-body {
+  border-bottom: 1px solid black;
+}
+
+.donate-header {
+  border-top: 1px solid black;
+}
+
+.error-try-again {
+  color: black;
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.player-choice {
+  display: flex;
+}
+
+.player-choice ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.player-choice ul li {
+  text-align: left;
+}
+
+.player-choice-image {
+  max-height: 25%;
+  max-width: 25%;
+}
+
+.player-record:hover {
+  background-color: #2fa6fbc7;
+  cursor: pointer;
+}

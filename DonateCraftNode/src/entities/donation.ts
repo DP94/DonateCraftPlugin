@@ -13,6 +13,9 @@ export class Donation {
     @ManyToOne(() => Player, player => player.donations)
     player!: Player;
 
+    @ManyToOne(() => Player, player => player.donations)
+    paidForBy?: Player;
+
     @Column()
     date!: Date;
 

@@ -35,8 +35,8 @@
       <span aria-hidden="true">&times;</span>
     </button>
     <div class="player-choice">
-      <ul>
-        <li *ngFor="let player of players" class="player-record" (click)="onDonatePlayerClick(modal, player.uuid)">
+      <ul class="w-100">
+        <li *ngFor="let player of players" class="player-record w-100" (click)="onDonatePlayerClick(modal, player.uuid)">
           <img class="player-choice-image col-sm-1" src='https://crafatar.com/avatars/{{ player.uuid}}'/>
           <span class="col-sm-2">{{player.name}}</span>
         </li>

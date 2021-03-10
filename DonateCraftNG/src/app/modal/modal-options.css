@@ -28,16 +28,20 @@
 .donate-body, .donate-header  {
   background-color: white;
   border-radius: 0;
-  border-left: 1px solid black;
-  border-right: 1px solid black;
+  border-left: 1px solid #676666;
+  border-right: 1px solid #676666;
 }
 
 .donate-body {
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid #676666;
 }
 
 .donate-header {
-  border-top: 1px solid black;
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  border-bottom: 1px solid #676666;
+  border-top: 1px solid #676666;
 }
 
 .error-try-again {
@@ -58,11 +62,12 @@
 
 .player-choice ul li {
   text-align: left;
+  padding: 1%;
 }
 
 .player-choice-image {
-  max-height: 25%;
-  max-width: 25%;
+  max-height: 20%;
+  max-width: 20%;
 }
 
 .player-record:hover {

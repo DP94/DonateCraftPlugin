@@ -1,5 +1,6 @@
 import {Column, Entity, ManyToOne, PrimaryColumn} from "typeorm";
 import {Player} from "./player";
+import {Session} from "./session";
 
 @Entity()
 export class Donation {
@@ -15,6 +16,9 @@ export class Donation {
 
     @ManyToOne(() => Player, player => player.donations)
     paidForBy?: Player;
+
+    @ManyToOne(() => Session, session => session.donations)
+    session!: Session;
 
     @Column()
     date!: Date;

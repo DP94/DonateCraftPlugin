@@ -55,7 +55,7 @@ router.post('/', jsonParser, async (request: Request, response: Response) => {
             death.reason = data.reason;
             death.date = new Date();
             death.player = player;
-                      const session: Session = new Session();
+            const session: Session = new Session();
             session.id = sessionId.max;
             death.session = session;
             if (player.deaths) {

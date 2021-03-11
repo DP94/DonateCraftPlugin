@@ -52,9 +52,13 @@ router.post('/', jsonParser, async (request: Request, response: Response) => {
             death.reason = data.reason;
             death.date = new Date();
             death.player = player;
-            let deaths: Death[] = [];
-            deaths.push(death);
-            player.deaths = deaths;
+            if (player.deaths) {
+                player.deaths.push(death);
+            } else {
+                let deaths: Death[] = [];
+                deaths.push(death);
+                player.deaths = deaths;
+            }
             await getManager().save(player);
             console.log(`Successfully recorded death for ${data.uuid}`);
             response.sendStatus(200);

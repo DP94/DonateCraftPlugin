@@ -58,7 +58,13 @@ router.post('/', jsonParser, async (request: Request, response: Response) => {
             const session: Session = new Session();
             session.id = sessionId.max;
             death.session = session;
-            player.deaths?.push(death);
+            if (player.deaths) {
+                player.deaths.push(death);
+            } else {
+                let deaths: Death[] = [];
+                deaths.push(death);
+                player.deaths = deaths;
+            }
             await getManager().save(player);
             console.log(`Successfully recorded death for ${data.uuid}`);
         } catch (e) {

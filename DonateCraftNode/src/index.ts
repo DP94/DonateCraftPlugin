@@ -8,6 +8,8 @@ import http from 'http';
 import {RevivalsDto} from "./dtos/revivals.dto";
 import {Donation} from "./entities/donation";
 import {Death} from "./entities/death";
+import {Vote} from "./entities/vote";
+import {VoteRecord} from "./entities/vote.record";
 
 const util = require('util')
 require('dotenv').config()
@@ -36,6 +38,7 @@ if (!DC_JUST_GIVING_DONATE_LINK) {
 const index = require('./routes/index.route');
 const players = require('./routes/players');
 const lock = require('./routes/lock')
+const vote = require('./routes/vote');
 
 const app = express();
 app.use(cors());
@@ -45,6 +48,7 @@ app.use(jsonParser);
 app.use('/', index);
 app.use('/players', players);
 app.use('/lock', lock);
+app.use('/vote', vote);
 app.use(express.static(process.cwd() + "/build/public/"));
 
 app.listen(PORT, () => {
@@ -219,7 +223,7 @@ function connectToDB() {
         password: DC_DB_PASSWORD,
         database: "donatecraft",
         entities: [
-            Player, Donation, RevivalLock, Death
+            Player, Donation, RevivalLock, Death, Vote, VoteRecord
         ],
         synchronize: true,
         logging: false,

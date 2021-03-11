@@ -7,3 +7,6 @@ commands:
   dc:
     description: Main donate craft command
     usage: /<command>
+  vote:
+    description: Vote command
+    usage: /<vote>

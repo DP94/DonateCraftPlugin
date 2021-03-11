@@ -6,6 +6,7 @@ import {DeathDto} from "../dtos/death.dto";
 import {Death} from "../entities/death";
 import {Request, Response} from "express";
 import {RevivalsDto} from "../dtos/revivals.dto";
+import {Session} from "../entities/session";
 
 const express = require('express');
 const router = express.Router();
@@ -42,7 +43,9 @@ router.post('/', jsonParser, async (request: Request, response: Response) => {
         try {
             console.log(`Death received for ${data.uuid}! Creating death data`);
             const playerRepository = getManager().getRepository(Player);
+            const sessionRepository = getManager().getRepository(Session);
             let player: Player | undefined = await playerRepository.findOne({uuid: data.uuid})
+            let sessionId = await sessionRepository.createQueryBuilder('session').select('MAX(session.id)', 'max').getRawOne();
             if (player === undefined) {
                 player = new Player();
                 player.uuid = data.uuid;
@@ -52,6 +55,9 @@ router.post('/', jsonParser, async (request: Request, response: Response) => {
             death.reason = data.reason;
             death.date = new Date();
             death.player = player;
+                      const session: Session = new Session();
+            session.id = sessionId.max;
+            death.session = session;
             if (player.deaths) {
                 player.deaths.push(death);
             } else {
@@ -61,7 +67,6 @@ router.post('/', jsonParser, async (request: Request, response: Response) => {
             }
             await getManager().save(player);
             console.log(`Successfully recorded death for ${data.uuid}`);
-            response.sendStatus(200);
         } catch (e) {
             console.log(`Encountered issue when trying to persist user stats! ${e}`);
         }

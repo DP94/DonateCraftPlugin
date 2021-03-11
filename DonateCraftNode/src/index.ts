@@ -10,6 +10,7 @@ import {Donation} from "./entities/donation";
 import {Death} from "./entities/death";
 import {Vote} from "./entities/vote";
 import {VoteRecord} from "./entities/vote.record";
+import {Session} from "./entities/session";
 
 const util = require('util')
 require('dotenv').config()
@@ -39,6 +40,7 @@ const index = require('./routes/index.route');
 const players = require('./routes/players');
 const lock = require('./routes/lock')
 const vote = require('./routes/vote');
+const session = require('./routes/session');
 
 const app = express();
 app.use(cors());
@@ -49,6 +51,7 @@ app.use('/', index);
 app.use('/players', players);
 app.use('/lock', lock);
 app.use('/vote', vote);
+app.use('/session', session);
 app.use(express.static(process.cwd() + "/build/public/"));
 
 app.listen(PORT, () => {
@@ -137,12 +140,16 @@ connectToDB().then(async () => {
                                 response.redirect(`/#/?status=error&key=${key}`);
                                 return;
                             } else {
+                                const sessionRepository = getManager().getRepository(Session);
+                                let sessionId = await sessionRepository.createQueryBuilder('session').select('MAX(session.id)', 'max').getRawOne();
                                 const donationRepository = getManager().getRepository(Donation);
                                 const donation = new Donation();
                                 donation.id = parseInt(donationid);
                                 donation.amount = donationData.amount;
                                 donation.charity = donationData.charityId;
                                 donation.player = player;
+                                const session: Session = new Session();
+                                session.id = sessionId.max;
                                 if (donorKey) {
                                     console.log(`Donor key is present for this donation! Proceeding to look up the player`)
                                     const donor: Player | undefined = await playerRepository.findOne({uuid: donorKey});
@@ -223,7 +230,7 @@ function connectToDB() {
         password: DC_DB_PASSWORD,
         database: "donatecraft",
         entities: [
-            Player, Donation, RevivalLock, Death, Vote, VoteRecord
+            Player, Donation, RevivalLock, Death, Vote, VoteRecord, Session
         ],
         synchronize: true,
         logging: false,

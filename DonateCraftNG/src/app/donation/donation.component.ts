@@ -1,9 +1,8 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ViewChild} from '@angular/core';
 import {Charity} from '../response/charity';
 import {DonationService} from './donation.service';
 import {ActivatedRoute} from '@angular/router';
 import {environment} from '../../environments/environment';
-import {Observable} from 'rxjs';
 import {ModalComponent} from '../modal/modal.component';
 
 @Component({
@@ -17,6 +16,7 @@ export class DonationComponent implements AfterViewInit {
   finishedLoading = false;
   charitiesLoaded = 0;
   playerKey = '';
+  donorKey = '';
 
   charityIds = new Array<number>();
 
@@ -45,27 +45,34 @@ export class DonationComponent implements AfterViewInit {
     }
 
     this.charityIds.forEach((id) => {
-        this.setCharityInformation(id);
+      this.setCharityInformation(id);
     });
   }
 
   onJGClick(charity: Charity): void {
-    window.open(environment.justGivingDonateUrl + charity.id + '?exiturl=' + environment.fullAPIUrl
-                                                    + 'callback?data=JUSTGIVING-DONATION-ID|'
-                                                    + this.playerKey, '_self');
+    let url = `${environment.justGivingDonateUrl}${charity.id}?exiturl=${environment.fullAPIUrl}callback?data=JUSTGIVING-DONATION-ID|${this.playerKey}`;
+    if (this.donorKey) {
+      url += `|${this.donorKey}`;
+    }
+    window.open(url, '_self');
   }
 
   setPlayerKeyFromURL(route: ActivatedRoute): void {
     route.paramMap.subscribe(params => {
       this.playerKey = params.get('key');
+      this.donorKey = params.get('donorKey');
     });
   }
 
   setCharityInformation(id: number): void {
+    console.log(`Loading ${id}`);
     this.donationService.getCharityDetails(id).subscribe(response => {
+      console.log(`Loaded ${id}`);
       this.charities.push(response);
       this.charitiesLoaded++;
+      console.log(`Loaded charity ${this.charitiesLoaded} out of ${this.charityIds.length}`);
       this.finishedLoading = (this.charitiesLoaded === this.charityIds.length);
+      console.log(this.finishedLoading);
     });
   }
 

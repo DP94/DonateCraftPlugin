@@ -9,7 +9,8 @@ public class Donation {
     private Date date;
     private long charity;
     private String charityName;
-    private boolean isPrivate;
+    private DCPlayer player;
+    private DCPlayer paidForBy;
 
     public long getId() {
         return id;
@@ -53,5 +54,21 @@ public class Donation {
 
     public void setCharityName(String charityName) {
         this.charityName = charityName;
+    }
+
+    public DCPlayer getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(DCPlayer player) {
+        this.player = player;
+    }
+
+    public DCPlayer getPaidForBy() {
+        return paidForBy;
+    }
+
+    public void setPaidForBy(DCPlayer paidForBy) {
+        this.paidForBy = paidForBy;
     }
 }

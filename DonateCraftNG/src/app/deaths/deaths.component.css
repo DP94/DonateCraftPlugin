@@ -2,6 +2,21 @@
   font-size: 64px;
 }
 
+.death-status {
+  vertical-align: middle;
+  text-align: center;
+  font-size: 24px;
+}
+
+.death-status.alive {
+  color: green;
+}
+
+.death-status.dead {
+  color: red;
+  font-weight: bold;
+}
+
 .death-count, .donation-count {
   vertical-align: middle;
   text-align: center;

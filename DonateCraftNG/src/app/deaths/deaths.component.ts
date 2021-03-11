@@ -5,6 +5,7 @@ import {DeathService} from './death.service';
 import {ActivatedRoute} from '@angular/router';
 import {ModalComponent} from '../modal/modal.component';
 import {Death} from '../response/death';
+import {RevivalLock} from '../response/revival.lock';
 
 @Component({
   selector: 'app-deaths',
@@ -14,16 +15,21 @@ import {Death} from '../response/death';
 export class DeathsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   players: Player[];
+  locks: RevivalLock[];
+  paidForDonations: Set<Donation>;
+
   playerPing;
   @ViewChild('modal') modal: ModalComponent;
 
-  constructor(private deathService: DeathService, private activatedRoute: ActivatedRoute) {}
+  constructor(private deathService: DeathService, private activatedRoute: ActivatedRoute) {
+  }
 
   ngOnInit(): void {
+    this.paidForDonations = new Set<Donation>();
     this.getPlayerStats();
     this.playerPing = setInterval(() => {
       this.getPlayerStats();
-    },  10000);
+    }, 10000);
   }
 
   ngAfterViewInit(): void {
@@ -45,15 +51,29 @@ export class DeathsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getPlayerStats(): void {
     this.deathService.getPlayerStats().subscribe(response => {
+      this.paidForDonations = new Set<Donation>();
       this.players = response.players;
+    });
+    this.deathService.getPlayerLocks().subscribe(response => {
+      this.locks = response.revivals;
     });
   }
 
 
-  getTotalDonationsForPlayer(donations: Donation[]): string {
+  getTotalDonationsForPlayer(player: Player, donations: Donation[]): string {
     let total = 0;
     for (const donation of donations) {
-      total += donation.amount;
+      // Can be done DB side, but i don't know how :(
+      if (donation.paidForBy === undefined || donation.paidForBy === null) {
+        total += donation.amount;
+      } else {
+        this.paidForDonations.add(donation);
+      }
+    }
+    for (const donation of this.paidForDonations) {
+      if (player.uuid === donation.paidForBy.uuid) {
+        total += donation.amount;
+      }
     }
     return total.toFixed(2);
   }
@@ -63,6 +83,18 @@ export class DeathsComponent implements OnInit, OnDestroy, AfterViewInit {
       return deaths[deaths.length - 1].reason;
     }
     return '';
+  }
+
+  getPlayerStatusFromAvailableLocks(player: Player): string {
+    if (this.locks && this.locks.length > 0 && player) {
+      for (const lock of this.locks) {
+        if (lock.key === player.uuid) {
+          return 'Dead';
+        }
+      }
+      return 'Alive';
+    }
+    return 'Unknown';
   }
 
 }

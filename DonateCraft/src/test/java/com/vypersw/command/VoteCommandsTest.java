@@ -2,28 +2,27 @@ package com.vypersw.command;
 
 import com.vypersw.network.HttpHelper;
 import com.vypersw.vote.VoteAnswer;
-import com.vypersw.vote.VoteRecord;
-import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.beans.Transient;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class VoteCommandsTest {
 
     @Mock
@@ -55,18 +54,18 @@ public class VoteCommandsTest {
 
     private VoteCommands voteCommands;
 
-    @Before
+    @BeforeEach
     public void before() {
         voteCommands = new VoteCommands(server, httpHelper);
-        when(server.getScoreboardManager()).thenReturn(scoreboardManager);
-        when(scoreboardManager.getNewScoreboard()).thenReturn(scoreboard);
-        when(scoreboard.registerNewObjective(anyString(), anyString(), anyString())).thenReturn(objective);
-        when(playerCommandSender.getName()).thenReturn("Test");
-        when(objective.getScore(playerCommandSender.getName())).thenReturn(score);
-        when(playerCommandSender.getUniqueId()).thenReturn(UUID.randomUUID());
+        lenient().when(server.getScoreboardManager()).thenReturn(scoreboardManager);
+        lenient().when(scoreboardManager.getNewScoreboard()).thenReturn(scoreboard);
+        lenient().when(scoreboard.registerNewObjective(anyString(), anyString(), anyString())).thenReturn(objective);
+        lenient().when(playerCommandSender.getName()).thenReturn("Test");
+        lenient().when(objective.getScore(playerCommandSender.getName())).thenReturn(score);
+        lenient().when(playerCommandSender.getUniqueId()).thenReturn(UUID.randomUUID());
     }
 
-    @After
+    @AfterEach
     public void after() {
         voteCommands.onCommand(playerCommandSender, command, "vote", new String[] {"end"});
     }
@@ -162,7 +161,7 @@ public class VoteCommandsTest {
         //Second player votes, but this time with just /vote yes
         voteCommands.onCommand(secondPlayer, command, "vote", new String[] {"yes"});
         verify(server).broadcastMessage("§6Test2§f just voted!");
-        verify(server).broadcastMessage("All players have voted! The result is §aYES!");
+        verify(server).broadcastMessage("All players have voted! The result for §6Testing a vote§f is §aYES!");
         verify(server).broadcastMessage("The vote has now ended.");
     }
 
@@ -172,7 +171,7 @@ public class VoteCommandsTest {
         voteCommands.onCommand(playerCommandSender, command, "vote", new String[] {"ask", "Testing a vote"});
         voteCommands.onCommand(playerCommandSender, command, "vote", new String[] {"answer", "no"});
         verify(server).broadcastMessage("§6Test§f just voted!");
-        verify(server).broadcastMessage("All players have voted! The result is §cNO!");
+        verify(server).broadcastMessage("All players have voted! The result for §6Testing a vote§f is §cNO!");
         verify(server).broadcastMessage("The vote has now ended.");
     }
 

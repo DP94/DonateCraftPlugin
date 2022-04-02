@@ -9,18 +9,18 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 import java.util.logging.Logger;
 
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ReanimationProtocolTest {
 
     @Mock
@@ -49,12 +49,12 @@ public class ReanimationProtocolTest {
     private PotionEffect heal;
     private PotionEffect damageResistance;
 
-    @Before
+    @BeforeEach
     public void before() {
         reanimationProtocol = new ReanimationProtocol(server, messageHelper, httpHelper);
         uuid = UUID.randomUUID();
-        when(server.getLogger()).thenReturn(logger);
-        when(server.getPlayer(uuid)).thenReturn(player);
+        lenient().when(server.getLogger()).thenReturn(logger);
+        lenient().when(server.getPlayer(uuid)).thenReturn(player);
         glowing = new PotionEffect(PotionEffectType.GLOWING, 200, 100, true, true);
         regen = new PotionEffect(PotionEffectType.REGENERATION, 200, 10, true, true);
         heal = new PotionEffect(PotionEffectType.HEAL, 200, 10, true, true);
@@ -63,14 +63,14 @@ public class ReanimationProtocolTest {
 
     @Test
     public void testThatPlayerWhoIsInSurvivalModeIsNotRevived() {
-        when(player.getGameMode()).thenReturn(GameMode.SURVIVAL);
+        lenient().when(player.getGameMode()).thenReturn(GameMode.SURVIVAL);
         reanimationProtocol.reanimatePlayer(uuid);
         verify(player, never()).setGameMode(GameMode.SURVIVAL);
     }
 
     @Test
     public void testThatAlivePlayerIsNotRevived() {
-        when(player.isDead()).thenReturn(false);
+        lenient().when(player.isDead()).thenReturn(false);
         reanimationProtocol.reanimatePlayer(uuid);
         verify(player, never()).setGameMode(GameMode.SURVIVAL);
     }

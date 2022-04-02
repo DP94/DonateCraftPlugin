@@ -2,19 +2,20 @@ package com.vypersw;
 
 import com.vypersw.vote.VoteAnswer;
 import org.bukkit.entity.Player;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class VoteManagerTest {
 
     @Mock
@@ -23,13 +24,13 @@ public class VoteManagerTest {
     @Mock
     private Player secondPlayer;
 
-    @Before
+    @BeforeEach
     public void before() {
         when(player.getUniqueId()).thenReturn(UUID.randomUUID());
-        when(secondPlayer.getUniqueId()).thenReturn(UUID.randomUUID());
+        lenient().when(secondPlayer.getUniqueId()).thenReturn(UUID.randomUUID());
     }
 
-    @After
+    @AfterEach
     public void after() {
         VoteManager.getInstance().end();
     }

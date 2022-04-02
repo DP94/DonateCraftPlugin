@@ -4,18 +4,15 @@ import com.vypersw.MessageHelper;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DonateCraftCommandsTest {
 
   @Mock
@@ -29,7 +26,7 @@ public class DonateCraftCommandsTest {
 
   private DonateCraftCommands donateCraftCommands;
 
-  @Before
+  @BeforeEach
   public void before() {
     donateCraftCommands = new DonateCraftCommands(messageHelper);
   }
@@ -39,7 +36,7 @@ public class DonateCraftCommandsTest {
   public void testOnCommandNotAPlayer() {
     donateCraftCommands.onCommand(consoleCommandSender, null, null, null);
 
-    verifyZeroInteractions(messageHelper);
+    verifyNoInteractions(messageHelper);
     verify(consoleCommandSender).sendMessage("Command must be used in game");
     verifyNoMoreInteractions(consoleCommandSender);
   }
@@ -49,7 +46,7 @@ public class DonateCraftCommandsTest {
     when(playerCommandSender.getGameMode()).thenReturn(GameMode.SURVIVAL);
     donateCraftCommands.onCommand(playerCommandSender, null, null, null);
 
-    verifyZeroInteractions(messageHelper);
+    verifyNoInteractions(messageHelper);
     verify(playerCommandSender).sendMessage("You seem to be alive to me? You must be dead to get your revival URL.");
     verify(playerCommandSender).getGameMode();
     verifyNoMoreInteractions(playerCommandSender);

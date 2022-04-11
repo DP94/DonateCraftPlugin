@@ -9,18 +9,18 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.UUID;
 import java.util.logging.Logger;
 
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ReanimationProtocolTest {
 
     @Mock
@@ -49,7 +49,7 @@ public class ReanimationProtocolTest {
     private PotionEffect heal;
     private PotionEffect damageResistance;
 
-    @BeforeEach
+    @Before
     public void before() {
         reanimationProtocol = new ReanimationProtocol(server, messageHelper, httpHelper);
         uuid = UUID.randomUUID();

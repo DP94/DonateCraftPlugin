@@ -6,13 +6,13 @@ import com.vypersw.response.Revival;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,10 +20,10 @@ import java.util.UUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class MessageHelperTest {
 
     private static final String SERVER_URL = "server.url";
@@ -42,7 +42,7 @@ public class MessageHelperTest {
     private Donation donation;
     private MessageHelper messageHelper;
 
-    @BeforeEach
+    @Before
     public void before() {
         lenient().when(player.getName()).thenReturn("Test");
         lenient().when(player.spigot()).thenReturn(spigotPlayer);

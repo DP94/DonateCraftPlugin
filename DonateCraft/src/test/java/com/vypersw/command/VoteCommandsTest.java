@@ -7,22 +7,23 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class VoteCommandsTest {
 
     @Mock
@@ -54,7 +55,7 @@ public class VoteCommandsTest {
 
     private VoteCommands voteCommands;
 
-    @BeforeEach
+    @Before
     public void before() {
         voteCommands = new VoteCommands(server, httpHelper);
         lenient().when(server.getScoreboardManager()).thenReturn(scoreboardManager);
@@ -65,7 +66,7 @@ public class VoteCommandsTest {
         lenient().when(playerCommandSender.getUniqueId()).thenReturn(UUID.randomUUID());
     }
 
-    @AfterEach
+    @After
     public void after() {
         voteCommands.onCommand(playerCommandSender, command, "vote", new String[] {"end"});
     }

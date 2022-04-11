@@ -4,15 +4,15 @@ import com.vypersw.MessageHelper;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class DonateCraftCommandsTest {
 
   @Mock
@@ -26,7 +26,7 @@ public class DonateCraftCommandsTest {
 
   private DonateCraftCommands donateCraftCommands;
 
-  @BeforeEach
+  @Before
   public void before() {
     donateCraftCommands = new DonateCraftCommands(messageHelper);
   }

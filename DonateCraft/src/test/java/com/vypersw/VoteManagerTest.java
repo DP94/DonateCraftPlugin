@@ -7,11 +7,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.UUID;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -26,7 +27,7 @@ public class VoteManagerTest {
     @Before
     public void before() {
         when(player.getUniqueId()).thenReturn(UUID.randomUUID());
-        when(secondPlayer.getUniqueId()).thenReturn(UUID.randomUUID());
+        lenient().when(secondPlayer.getUniqueId()).thenReturn(UUID.randomUUID());
     }
 
     @After

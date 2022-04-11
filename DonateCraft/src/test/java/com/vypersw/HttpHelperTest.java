@@ -2,6 +2,8 @@ package com.vypersw;
 
 import com.vypersw.network.HttpHelper;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.net.http.HttpRequest;
 import java.util.List;
@@ -11,6 +13,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertEquals;
 
+@RunWith(MockitoJUnitRunner.class)
 public class HttpHelperTest {
 
     @Test

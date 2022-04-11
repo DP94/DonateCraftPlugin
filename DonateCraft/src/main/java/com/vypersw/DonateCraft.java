@@ -4,6 +4,7 @@ import com.vypersw.command.DonateCraftCommands;
 import com.vypersw.command.VoteCommands;
 import com.vypersw.listeners.PlayerListener;
 import com.vypersw.network.HttpHelper;
+import com.vypersw.vote.VotePoller;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class DonateCraft extends JavaPlugin {
@@ -24,5 +25,7 @@ public class DonateCraft extends JavaPlugin {
         this.getCommand("vote").setExecutor(new VoteCommands(getServer(), httpHelper));
         ReanimationProtocol reanimationProtocol = new ReanimationProtocol(getServer(), messageHelper, httpHelper);
         getServer().getScheduler().scheduleSyncRepeatingTask(this, reanimationProtocol, 5 * TICKS_TO_SECONDS, 10 * TICKS_TO_SECONDS);
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, new VotePoller(getServer(), httpHelper),
+                5 * TICKS_TO_SECONDS, 15 * TICKS_TO_SECONDS);
     }
 }

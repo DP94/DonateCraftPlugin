@@ -12,7 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,9 +21,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MessageHelperTest {
@@ -46,9 +44,9 @@ public class MessageHelperTest {
 
     @Before
     public void before() {
-        when(player.getName()).thenReturn("Test");
-        when(player.spigot()).thenReturn(spigotPlayer);
-        when(player.getUniqueId()).thenReturn(PLAYER_UUID);
+        lenient().when(player.getName()).thenReturn("Test");
+        lenient().when(player.spigot()).thenReturn(spigotPlayer);
+        lenient().when(player.getUniqueId()).thenReturn(PLAYER_UUID);
         messageHelper = new MessageHelper(SERVER_URL);
         revival = new Revival();
         revival.setId(1L);

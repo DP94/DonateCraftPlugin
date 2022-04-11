@@ -21,7 +21,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Collections;
 import java.util.UUID;
@@ -29,11 +29,8 @@ import java.util.logging.Logger;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PlayerListenerTest {
@@ -80,15 +77,15 @@ public class PlayerListenerTest {
 
   @Before
   public void before() {
-    when(player.getUniqueId()).thenReturn(PLAYER_UUID);
-    when(player.getName()).thenReturn(PLAYER_NAME);
-    when(player.getWorld()).thenReturn(world);
-    when(player.getLocation()).thenReturn(PLAYER_LOCATION);
+    lenient().when(player.getUniqueId()).thenReturn(PLAYER_UUID);
+    lenient().when(player.getName()).thenReturn(PLAYER_NAME);
+    lenient().when(player.getWorld()).thenReturn(world);
+    lenient().when(player.getLocation()).thenReturn(PLAYER_LOCATION);
     playerListener = new PlayerListener(messageHelper, httpHelper);
 
-    when(server.getLogger()).thenReturn(serverLogger);
-    when(server.getItemFactory()).thenReturn(serverItemFactory);
-    when(serverItemFactory.getItemMeta(Material.PLAYER_HEAD)).thenReturn(skullMeta);
+    lenient().when(server.getLogger()).thenReturn(serverLogger);
+    lenient().when(server.getItemFactory()).thenReturn(serverItemFactory);
+    lenient().when(serverItemFactory.getItemMeta(Material.PLAYER_HEAD)).thenReturn(skullMeta);
 
     // Right now this works as it is the only test that requires Bukkit internals.
     // If future tests require this we will need a more robust solution.
@@ -137,7 +134,7 @@ public class PlayerListenerTest {
     when(player.getGameMode()).thenReturn(GameMode.SURVIVAL);
     playerListener.onLogin(new PlayerJoinEvent(player, null));
 
-    verifyZeroInteractions(messageHelper);
+    verifyNoInteractions(messageHelper);
     verify(player).getGameMode();
     verifyNoMoreInteractions(player);
   }

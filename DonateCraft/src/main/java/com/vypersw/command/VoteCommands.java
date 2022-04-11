@@ -99,7 +99,9 @@ public class VoteCommands implements CommandExecutor {
                 } else if (result == VoteAnswer.NO) {
                     color = ChatColor.RED;
                 }
-                server.broadcastMessage("All players have voted! The result is " + color + voteManager.calculateWinningVote() + "!");
+                server.broadcastMessage("All players have voted! The result for " +
+                        ChatColor.GOLD + voteManager.getActiveVote().getQuestion() + ChatColor.WHITE + " is " +
+                        color + voteManager.calculateWinningVote() + "!");
                 server.broadcastMessage("The vote has now ended.");
                 voteManager.getActiveVote().setDateFinished(new Date());
                 httpHelper.fireAsyncPostRequestToServer("/vote", voteManager.getActiveVote());
@@ -114,7 +116,7 @@ public class VoteCommands implements CommandExecutor {
     }
 
     private void processEnd(VoteManager voteManager, Player commandSender) {
-        if (voteManager.isVoteActive() && voteManager.getActiveVote().getAuthor().equals(commandSender.getUniqueId())) {
+        if (voteManager.isVoteActive() && (voteManager.getActiveVote().getAuthor().equals(commandSender.getUniqueId()) || commandSender.isOp())) {
             voteManager.getActiveVote().setDateFinished(new Date());
             httpHelper.fireAsyncPostRequestToServer("/vote", voteManager.getActiveVote());
             voteManager.end();
@@ -131,7 +133,7 @@ public class VoteCommands implements CommandExecutor {
     private void createScoreboardForVote(String question, Collection<? extends Player> onlinePlayers) {
         ScoreboardManager scoreboardManager = server.getScoreboardManager();
         scoreboard = scoreboardManager.getNewScoreboard();
-        objective = scoreboard.registerNewObjective(question, "", question);
+        objective = scoreboard.registerNewObjective("test", "test", question);
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         objective.setDisplayName(ChatColor.GOLD + question);
         scoreboard.registerNewObjective("Name", question, question);
@@ -160,6 +162,9 @@ public class VoteCommands implements CommandExecutor {
             case "n":
             case "false":
                 return VoteAnswer.NO;
+            case "abstain":
+            case "a":
+                return VoteAnswer.ABSTAIN;
             default:
                 return null;
         }

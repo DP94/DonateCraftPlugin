@@ -2,8 +2,6 @@ package com.vypersw.command;
 
 import com.vypersw.network.HttpHelper;
 import com.vypersw.vote.VoteAnswer;
-import com.vypersw.vote.VoteRecord;
-import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -14,10 +12,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import java.beans.Transient;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -58,12 +58,12 @@ public class VoteCommandsTest {
     @Before
     public void before() {
         voteCommands = new VoteCommands(server, httpHelper);
-        when(server.getScoreboardManager()).thenReturn(scoreboardManager);
-        when(scoreboardManager.getNewScoreboard()).thenReturn(scoreboard);
-        when(scoreboard.registerNewObjective(anyString(), anyString(), anyString())).thenReturn(objective);
-        when(playerCommandSender.getName()).thenReturn("Test");
-        when(objective.getScore(playerCommandSender.getName())).thenReturn(score);
-        when(playerCommandSender.getUniqueId()).thenReturn(UUID.randomUUID());
+        lenient().when(server.getScoreboardManager()).thenReturn(scoreboardManager);
+        lenient().when(scoreboardManager.getNewScoreboard()).thenReturn(scoreboard);
+        lenient().when(scoreboard.registerNewObjective(anyString(), anyString(), anyString())).thenReturn(objective);
+        lenient().when(playerCommandSender.getName()).thenReturn("Test");
+        lenient().when(objective.getScore(playerCommandSender.getName())).thenReturn(score);
+        lenient().when(playerCommandSender.getUniqueId()).thenReturn(UUID.randomUUID());
     }
 
     @After
@@ -162,7 +162,7 @@ public class VoteCommandsTest {
         //Second player votes, but this time with just /vote yes
         voteCommands.onCommand(secondPlayer, command, "vote", new String[] {"yes"});
         verify(server).broadcastMessage("§6Test2§f just voted!");
-        verify(server).broadcastMessage("All players have voted! The result is §aYES!");
+        verify(server).broadcastMessage("All players have voted! The result for §6Testing a vote§f is §aYES!");
         verify(server).broadcastMessage("The vote has now ended.");
     }
 
@@ -172,7 +172,7 @@ public class VoteCommandsTest {
         voteCommands.onCommand(playerCommandSender, command, "vote", new String[] {"ask", "Testing a vote"});
         voteCommands.onCommand(playerCommandSender, command, "vote", new String[] {"answer", "no"});
         verify(server).broadcastMessage("§6Test§f just voted!");
-        verify(server).broadcastMessage("All players have voted! The result is §cNO!");
+        verify(server).broadcastMessage("All players have voted! The result for §6Testing a vote§f is §cNO!");
         verify(server).broadcastMessage("The vote has now ended.");
     }
 

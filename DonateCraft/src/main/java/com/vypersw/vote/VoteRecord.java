@@ -54,6 +54,6 @@ public class VoteRecord {
 
     @Override
     public int hashCode() {
-        return Objects.hash(voter, decision, timeVoted);
+        return Objects.hash(voter);
     }
 }

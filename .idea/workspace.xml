@@ -220,12 +220,12 @@
     </configuration>
     <list>
       <item itemvalue="JUnit.All in DonateCraft" />
-      <item itemvalue="Maven.DonateCraft [clean,install]" />
-      <item itemvalue="Remote JVM Debug.Debug plugin" />
       <item itemvalue="JUnit.PlayerListenerTest" />
       <item itemvalue="JUnit.ReanimationProtocolTest" />
       <item itemvalue="JUnit.VoteManagerTest.testIsVoteActiveReturnsTrueWhenVoteIsNotNull" />
       <item itemvalue="JUnit.VoteManagerTest" />
+      <item itemvalue="Maven.DonateCraft [clean,install]" />
+      <item itemvalue="Remote JVM Debug.Debug plugin" />
     </list>
     <recent_temporary>
       <list>

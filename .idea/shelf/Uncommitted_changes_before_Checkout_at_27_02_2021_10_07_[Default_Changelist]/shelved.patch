@@ -1,0 +1,343 @@
+Index: ../DonateCraftNode/.env
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>DC_DB_USERNAME=db_user\r\nDC_DB_PASSWORD=db_pass\r\nDC_JG_API_KEY=apikey\r\nDC_EXTERNAL_HOST=http://localhost:8000\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- ../DonateCraftNode/.env	(revision 5629631f204d029131cbd33f5c888b9735aa0719)
++++ ../DonateCraftNode/.env	(date 1614289305145)
+@@ -1,4 +1,4 @@
+-DC_DB_USERNAME=db_user
+-DC_DB_PASSWORD=db_pass
+-DC_JG_API_KEY=apikey
++DC_DB_USERNAME=dan
++DC_DB_PASSWORD=Suicune245
++DC_JG_API_KEY=296a9290
+ DC_EXTERNAL_HOST=http://localhost:8000
+Index: src/main/java/com/vypersw/listeners/PlayerListener.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.vypersw.listeners;\r\n\r\nimport net.md_5.bungee.api.chat.ClickEvent;\r\nimport net.md_5.bungee.api.chat.ComponentBuilder;\r\nimport net.md_5.bungee.api.chat.HoverEvent;\r\nimport net.md_5.bungee.api.chat.TextComponent;\r\nimport org.bukkit.event.EventHandler;\r\nimport org.bukkit.event.Listener;\r\nimport org.bukkit.event.entity.PlayerDeathEvent;\r\nimport org.json.JSONObject;\r\n\r\nimport java.net.URI;\r\nimport java.net.http.HttpClient;\r\nimport java.net.http.HttpRequest;\r\nimport java.net.http.HttpResponse;\r\n\r\npublic class PlayerListener implements Listener {\r\n\r\n    @EventHandler\r\n    void onPlayerDeath(PlayerDeathEvent event) {\r\n\r\n        JSONObject deathProperties = new JSONObject();\r\n        deathProperties.put(\"uuid\", event.getEntity().getUniqueId().toString());\r\n        deathProperties.put(\"name\", event.getEntity().getDisplayName());\r\n        deathProperties.put(\"lastdeathreason\", event.getDeathMessage());\r\n        JSONObject deathObject = new JSONObject();\r\n        deathObject.put(\"death\", deathProperties);\r\n\r\n        final String deathURL = \"http://localhost:8000#donate?key=\" + event.getEntity().getUniqueId().toString();\r\n\r\n        HttpRequest request = HttpRequest.newBuilder()\r\n                .uri(URI.create(\"http://localhost:8000/lock\"))\r\n                .header(\"Content-Type\", \"application/json\")\r\n                .POST(HttpRequest.BodyPublishers.ofString(deathObject.toString()))\r\n                .build();\r\n        HttpClient client = HttpClient.newBuilder().build();\r\n        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())\r\n                .thenApply(HttpResponse::body).thenRun(() -> event.getEntity().spigot().sendMessage(new ComponentBuilder(\"You died! Please click this link to donate to a charity to buy back in!\")\r\n                .event(new ClickEvent(ClickEvent.Action.OPEN_URL, deathURL))\r\n                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(deathURL).create()))\r\n                .create()));\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/vypersw/listeners/PlayerListener.java	(revision 5629631f204d029131cbd33f5c888b9735aa0719)
++++ src/main/java/com/vypersw/listeners/PlayerListener.java	(date 1614419745796)
+@@ -16,6 +16,13 @@
+ 
+ public class PlayerListener implements Listener {
+ 
++    private final String serverURL;
++
++    public PlayerListener(String serverURL) {
++        this.serverURL = serverURL;
++    }
++
++
+     @EventHandler
+     void onPlayerDeath(PlayerDeathEvent event) {
+ 
+@@ -26,10 +33,10 @@
+         JSONObject deathObject = new JSONObject();
+         deathObject.put("death", deathProperties);
+ 
+-        final String deathURL = "http://localhost:8000#donate?key=" + event.getEntity().getUniqueId().toString();
++        final String deathURL = serverURL + "#donate?key=" + event.getEntity().getUniqueId().toString();
+ 
+         HttpRequest request = HttpRequest.newBuilder()
+-                .uri(URI.create("http://localhost:8000/lock"))
++                .uri(URI.create(serverURL + "/lock"))
+                 .header("Content-Type", "application/json")
+                 .POST(HttpRequest.BodyPublishers.ofString(deathObject.toString()))
+                 .build();
+Index: ../DonateCraftNG/src/app/app.service.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import { Injectable } from '@angular/core';\r\nimport {HttpClient} from '@angular/common/http';\r\nimport {Observable} from 'rxjs';\r\nimport {PlayerResponse} from './response/player.response';\r\n\r\n@Injectable({\r\n  providedIn: 'root'\r\n})\r\nexport class AppService {\r\n\r\n  constructor(private http: HttpClient) {}\r\n\r\n  getPlayerStats(): Observable<PlayerResponse> {\r\n    return this.http.get<PlayerResponse>('http://localhost:8000/players');\r\n  }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- ../DonateCraftNG/src/app/app.service.ts	(revision 5629631f204d029131cbd33f5c888b9735aa0719)
++++ ../DonateCraftNG/src/app/app.service.ts	(date 1614417269230)
+@@ -2,6 +2,7 @@
+ import {HttpClient} from '@angular/common/http';
+ import {Observable} from 'rxjs';
+ import {PlayerResponse} from './response/player.response';
++import { environment } from '../environments/environment';
+ 
+ @Injectable({
+   providedIn: 'root'
+@@ -11,6 +12,6 @@
+   constructor(private http: HttpClient) {}
+ 
+   getPlayerStats(): Observable<PlayerResponse> {
+-    return this.http.get<PlayerResponse>('http://localhost:8000/players');
++    return this.http.get<PlayerResponse>(environment.apiUrl + 'players');
+   }
+ }
+Index: src/main/java/com/vypersw/DonateCraft.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.vypersw;\r\n\r\nimport com.vypersw.listeners.PlayerListener;\r\nimport org.bukkit.Bukkit;\r\nimport org.bukkit.plugin.java.JavaPlugin;\r\n\r\npublic class DonateCraft extends JavaPlugin {\r\n\r\n    public static final int TICKS_TO_SECONDS = 20;\r\n\r\n    @Override\r\n    public void onEnable() {\r\n        getServer().getPluginManager().registerEvents(new PlayerListener(), this);\r\n        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new ReanimationProtocol(getServer()), 5 * TICKS_TO_SECONDS, 10 * TICKS_TO_SECONDS);\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/vypersw/DonateCraft.java	(revision 5629631f204d029131cbd33f5c888b9735aa0719)
++++ src/main/java/com/vypersw/DonateCraft.java	(date 1614420291990)
+@@ -4,13 +4,18 @@
+ import org.bukkit.Bukkit;
+ import org.bukkit.plugin.java.JavaPlugin;
+ 
++import java.util.ResourceBundle;
++
+ public class DonateCraft extends JavaPlugin {
+ 
+     public static final int TICKS_TO_SECONDS = 20;
+ 
+     @Override
+     public void onEnable() {
+-        getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+-        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new ReanimationProtocol(getServer()), 5 * TICKS_TO_SECONDS, 10 * TICKS_TO_SECONDS);
++        ResourceBundle bundle = ResourceBundle.getBundle("env");
++        final String serverUrl = bundle.getString("SERVER_URL");
++        getServer().getPluginManager().registerEvents(new PlayerListener(serverUrl), this);
++        ReanimationProtocol reanimationProtocol = new ReanimationProtocol(getServer(), serverUrl);
++        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, reanimationProtocol, 5 * TICKS_TO_SECONDS, 10 * TICKS_TO_SECONDS);
+     }
+ }
+Index: src/main/resources/env.properties
+===================================================================
+--- src/main/resources/env.properties	(date 1614419866715)
++++ src/main/resources/env.properties	(date 1614419866715)
+@@ -0,0 +1,2 @@
++#Should eventually move this into a .config file for external use
++SERVER_URL=http://localhost:8000
+Index: ../DonateCraftNG/src/app/donation/donation.component.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><div>\r\n  <table class=\"table table-striped h-100\">\r\n    <tbody class=\"h-100\">\r\n    <tr *ngFor=\"let charity of charities\" class=\"charity-row h-100\">\r\n    <td class=\"h-100 charity-image-td\">\r\n      <div class=\"charity-image h-100\">\r\n          <img src=\"{{charity.logoAbsoluteUrl}}\" class=\"charity-image\" alt=\"Could not load image, has the charity set one?\"/>\r\n      </div>\r\n    <td>\r\n      <div class=\"charity-info-wrapper\">\r\n        <span class=\"charity-info charity-name\">{{ charity.name }}</span>\r\n        <span class=\"charity-info charity-description\"> {{ charity.description }}</span>\r\n        <a href=\"https://link.staging.justgiving.com/v1/charity/donate/charityId/{{charity.id}}?exiturl=http://localhost:8000/callback?data=JUSTGIVING-DONATION-ID|{{playerKey}}\"><button class=\"btn btn-success charity-donate charity-info\">Donate</button></a>\r\n      </div>\r\n    </td>\r\n    </tr>\r\n    </tbody>\r\n  </table>\r\n\r\n  <div id=\"loader\" *ngIf=\"!finishedLoading\"></div>\r\n</div>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- ../DonateCraftNG/src/app/donation/donation.component.html	(revision 5629631f204d029131cbd33f5c888b9735aa0719)
++++ ../DonateCraftNG/src/app/donation/donation.component.html	(date 1614417831081)
+@@ -2,17 +2,21 @@
+   <table class="table table-striped h-100">
+     <tbody class="h-100">
+     <tr *ngFor="let charity of charities" class="charity-row h-100">
+-    <td class="h-100 charity-image-td">
+-      <div class="charity-image h-100">
+-          <img src="{{charity.logoAbsoluteUrl}}" class="charity-image" alt="Could not load image, has the charity set one?"/>
+-      </div>
+-    <td>
+-      <div class="charity-info-wrapper">
+-        <span class="charity-info charity-name">{{ charity.name }}</span>
+-        <span class="charity-info charity-description"> {{ charity.description }}</span>
+-        <a href="https://link.staging.justgiving.com/v1/charity/donate/charityId/{{charity.id}}?exiturl=http://localhost:8000/callback?data=JUSTGIVING-DONATION-ID|{{playerKey}}"><button class="btn btn-success charity-donate charity-info">Donate</button></a>
+-      </div>
+-    </td>
++      <td class="h-100 charity-image-td">
++        <div class="charity-image h-100">
++          <img src="{{charity.logoAbsoluteUrl}}" class="charity-image"
++               alt="Could not load image, has the charity set one?"/>
++        </div>
++      <td>
++        <div class="charity-info-wrapper">
++          <span class="charity-info charity-name">{{ charity.name }}</span>
++          <span class="charity-info charity-description"> {{ charity.description }}</span>
++          <a
++            href="{{directiveEnv.justGivingDonateUrl}}{{charity.id}}?exiturl={{directiveEnv.apiUrl}}callback?data=JUSTGIVING-DONATION-ID|{{playerKey}}">
++            <button class="btn btn-success charity-donate charity-info">Donate</button>
++          </a>
++        </div>
++      </td>
+     </tr>
+     </tbody>
+   </table>
+Index: ../DonateCraftNG/src/app/donation/donation.service.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import { Injectable } from '@angular/core';\r\nimport {HttpClient} from '@angular/common/http';\r\nimport {Observable} from 'rxjs';\r\nimport {Charity} from '../response/charity';\r\n\r\n@Injectable({\r\n  providedIn: 'root'\r\n})\r\nexport class DonationService {\r\n\r\n  constructor(private httpClient: HttpClient) { }\r\n\r\n  getCharityDetails(id: number): Observable<Charity> {\r\n    return this.httpClient.get<Charity>('https://api.staging.justgiving.com/redacted/v1/charity/' + id);\r\n  }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- ../DonateCraftNG/src/app/donation/donation.service.ts	(revision 5629631f204d029131cbd33f5c888b9735aa0719)
++++ ../DonateCraftNG/src/app/donation/donation.service.ts	(date 1614419056429)
+@@ -2,6 +2,7 @@
+ import {HttpClient} from '@angular/common/http';
+ import {Observable} from 'rxjs';
+ import {Charity} from '../response/charity';
++import { environment } from '../../environments/environment';
+ 
+ @Injectable({
+   providedIn: 'root'
+@@ -11,6 +12,6 @@
+   constructor(private httpClient: HttpClient) { }
+ 
+   getCharityDetails(id: number): Observable<Charity> {
+-    return this.httpClient.get<Charity>('https://api.staging.justgiving.com/redacted/v1/charity/' + id);
++    return this.httpClient.get<Charity>(environment.justGivingAPIUrl + '/charity/' + id);
+   }
+ }
+Index: ../DonateCraftNG/src/app/donation/donation.component.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import { Component, OnInit } from '@angular/core';\r\nimport {Charity} from '../response/charity';\r\nimport {DonationService} from './donation.service';\r\nimport {ActivatedRoute} from '@angular/router';\r\n\r\n@Component({\r\n  selector: 'app-donation',\r\n  templateUrl: './donation.component.html',\r\n  styleUrls: ['./donation.component.css']\r\n})\r\nexport class DonationComponent implements OnInit {\r\n\r\n  charities: Charity[];\r\n  finishedLoading = false;\r\n  charitiesLoaded = 0;\r\n  playerKey = '';\r\n\r\n  charityIds = new Array<number>();\r\n  constructor(private donationService: DonationService, private activatedRoute: ActivatedRoute) { }\r\n\r\n  ngOnInit(): void {\r\n\r\n    this.charities = new Array<Charity>();\r\n    // Can retrieve these from DB at a later time\r\n    this.charityIds.push(13441, 2357, 255811, 2201, 182244, 233, 11200, 300);\r\n    this.charityIds.forEach((id) => {\r\n      this.donationService.getCharityDetails(id).subscribe(response => {\r\n        this.charities.push(response);\r\n        this.charitiesLoaded++;\r\n        this.finishedLoading = (this.charitiesLoaded === this.charityIds.length);\r\n        if (this.finishedLoading) {\r\n          this.activatedRoute.queryParams.subscribe(params => {\r\n            this.playerKey = params.key;\r\n          });\r\n        }\r\n      });\r\n    });\r\n  }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- ../DonateCraftNG/src/app/donation/donation.component.ts	(revision 5629631f204d029131cbd33f5c888b9735aa0719)
++++ ../DonateCraftNG/src/app/donation/donation.component.ts	(date 1614417831075)
+@@ -2,6 +2,7 @@
+ import {Charity} from '../response/charity';
+ import {DonationService} from './donation.service';
+ import {ActivatedRoute} from '@angular/router';
++import { environment } from '../../environments/environment';
+ 
+ @Component({
+   selector: 'app-donation',
+@@ -14,6 +15,7 @@
+   finishedLoading = false;
+   charitiesLoaded = 0;
+   playerKey = '';
++  directiveEnv = environment;
+ 
+   charityIds = new Array<number>();
+   constructor(private donationService: DonationService, private activatedRoute: ActivatedRoute) { }
+Index: src/main/java/com/vypersw/ReanimationProtocol.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.vypersw;\r\n\r\nimport org.bukkit.Bukkit;\r\nimport org.bukkit.GameMode;\r\nimport org.bukkit.Server;\r\nimport org.bukkit.entity.Player;\r\nimport org.json.JSONArray;\r\nimport org.json.JSONObject;\r\n\r\nimport java.net.URI;\r\nimport java.net.http.HttpClient;\r\nimport java.net.http.HttpRequest;\r\nimport java.net.http.HttpResponse;\r\nimport java.util.HashSet;\r\nimport java.util.Set;\r\nimport java.util.UUID;\r\nimport java.util.concurrent.BlockingQueue;\r\nimport java.util.concurrent.LinkedBlockingQueue;\r\n\r\npublic class ReanimationProtocol implements Runnable {\r\n\r\n    private Server server;\r\n    private BlockingQueue<UUID> toRevive = new LinkedBlockingQueue<>();\r\n\r\n    public ReanimationProtocol(Server server) {\r\n        this.server = server;\r\n    }\r\n\r\n    @Override\r\n    public void run() {\r\n        reanimateEligiblePlayers();\r\n    }\r\n\r\n    private void reanimateEligiblePlayers() {\r\n\r\n        HttpRequest request = getReanimationListRequest();\r\n        HttpClient client = HttpClient.newBuilder().build();\r\n        client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenAccept(asyncResponse -> {\r\n            JSONObject object = new JSONObject(asyncResponse.body());\r\n            JSONArray array = object.getJSONArray(\"revivals\");\r\n            for (int i = 0; i < array.length(); i++) {\r\n                JSONObject player = array.getJSONObject(i);\r\n                String uuid = player.getString(\"key\");\r\n                System.out.println(\"Received UUID which is eligible to be revived! \" + uuid);\r\n                toRevive.offer(UUID.fromString(uuid));\r\n            }\r\n        });\r\n\r\n        Set<UUID> uuids = new HashSet<>();\r\n        toRevive.drainTo(uuids);\r\n        for (UUID uuid : uuids) {\r\n            reanimatePlayer(uuid);\r\n        }\r\n    }\r\n\r\n    private HttpRequest getReanimationListRequest() {\r\n        return HttpRequest.newBuilder()\r\n                .uri(URI.create(\"http://86.168.247.27:8000/unlocked\"))\r\n                .header(\"Content-Type\", \"application/json\")\r\n                .GET()\r\n                .build();\r\n    }\r\n\r\n    private void reanimatePlayer(UUID uuid) {\r\n        Player player = Bukkit.getPlayer(uuid);\r\n        System.out.println(\"In reanimate player: \" + uuid.toString());\r\n        //Extra checks just in case Minecraft has pinged the server again before our async call has come back\r\n        if (player != null && player.isOnline() && (player.isDead() || player.getGameMode() == GameMode.SPECTATOR)) {\r\n            System.out.println(\"Attempting to revive \" + player.getName());\r\n            server.broadcastMessage(\"Revived \" + player.getName());\r\n            player.setGameMode(GameMode.SURVIVAL);\r\n            fireRevivedRequest(uuid);\r\n        }\r\n    }\r\n\r\n    private void fireRevivedRequest(UUID uuid) {\r\n        JSONObject deathObject = new JSONObject();\r\n        deathObject.put(\"uuid\", uuid.toString());\r\n        System.out.println(\"Firing revived request\");\r\n        HttpRequest request = HttpRequest.newBuilder()\r\n                .uri(URI.create(\"http://localhost:8000/revived\"))\r\n                .header(\"Content-Type\", \"application/json\")\r\n                .POST(HttpRequest.BodyPublishers.ofString(deathObject.toString()))\r\n                .build();\r\n        HttpClient client = HttpClient.newBuilder().build();\r\n        client.sendAsync(request, HttpResponse.BodyHandlers.ofString());\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- src/main/java/com/vypersw/ReanimationProtocol.java	(revision 5629631f204d029131cbd33f5c888b9735aa0719)
++++ src/main/java/com/vypersw/ReanimationProtocol.java	(date 1614420385692)
+@@ -19,15 +19,18 @@
+ 
+ public class ReanimationProtocol implements Runnable {
+ 
+-    private Server server;
++    private final Server server;
++    private final String serverURL;
+     private BlockingQueue<UUID> toRevive = new LinkedBlockingQueue<>();
+ 
+-    public ReanimationProtocol(Server server) {
++    public ReanimationProtocol(Server server, String serverURL) {
+         this.server = server;
++        this.serverURL = serverURL;
+     }
+ 
+     @Override
+     public void run() {
++        Bukkit.getLogger().info("Running reanimation protocol");
+         reanimateEligiblePlayers();
+     }
+ 
+@@ -37,12 +40,20 @@
+         HttpClient client = HttpClient.newBuilder().build();
+         client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenAccept(asyncResponse -> {
+             JSONObject object = new JSONObject(asyncResponse.body());
+-            JSONArray array = object.getJSONArray("revivals");
+-            for (int i = 0; i < array.length(); i++) {
+-                JSONObject player = array.getJSONObject(i);
+-                String uuid = player.getString("key");
+-                System.out.println("Received UUID which is eligible to be revived! " + uuid);
+-                toRevive.offer(UUID.fromString(uuid));
++            if (object.has("revivals")) {
++                JSONArray array = object.getJSONArray("revivals");
++                for (int i = 0; i < array.length(); i++) {
++                    JSONObject player = array.getJSONObject(i);
++                    if (player.has("key")) {
++                        String uuid = player.getString("key");
++                        Bukkit.getLogger().info("Received UUID which is eligible to be revived! " + uuid);
++                        toRevive.offer(UUID.fromString(uuid));
++                    } else {
++                        Bukkit.getLogger().warning("Could not find player object in revivals JSON response - has the server response changed?");
++                    }
++                }
++            } else {
++                Bukkit.getLogger().warning("Could not find revivals array in JSON response - has the server response changed?");
+             }
+         });
+ 
+@@ -55,7 +66,7 @@
+ 
+     private HttpRequest getReanimationListRequest() {
+         return HttpRequest.newBuilder()
+-                .uri(URI.create("http://86.168.247.27:8000/unlocked"))
++                .uri(URI.create(serverURL + "/unlocked"))
+                 .header("Content-Type", "application/json")
+                 .GET()
+                 .build();
+@@ -63,10 +74,9 @@
+ 
+     private void reanimatePlayer(UUID uuid) {
+         Player player = Bukkit.getPlayer(uuid);
+-        System.out.println("In reanimate player: " + uuid.toString());
+         //Extra checks just in case Minecraft has pinged the server again before our async call has come back
+         if (player != null && player.isOnline() && (player.isDead() || player.getGameMode() == GameMode.SPECTATOR)) {
+-            System.out.println("Attempting to revive " + player.getName());
++            Bukkit.getLogger().info("Attempting to revive " + player.getName());
+             server.broadcastMessage("Revived " + player.getName());
+             player.setGameMode(GameMode.SURVIVAL);
+             fireRevivedRequest(uuid);
+@@ -78,7 +88,7 @@
+         deathObject.put("uuid", uuid.toString());
+         System.out.println("Firing revived request");
+         HttpRequest request = HttpRequest.newBuilder()
+-                .uri(URI.create("http://localhost:8000/revived"))
++                .uri(URI.create(serverURL + "/revived"))
+                 .header("Content-Type", "application/json")
+                 .POST(HttpRequest.BodyPublishers.ofString(deathObject.toString()))
+                 .build();
+Index: ../DonateCraftNG/src/environments/environment.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>// This file can be replaced during build by using the `fileReplacements` array.\r\n// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.\r\n// The list of file replacements can be found in `angular.json`.\r\n\r\nexport const environment = {\r\n  production: false\r\n};\r\n\r\n/*\r\n * For easier debugging in development mode, you can import the following file\r\n * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.\r\n *\r\n * This import should be commented out in production mode because it will have a negative impact\r\n * on performance if an error is thrown.\r\n */\r\n// import 'zone.js/dist/zone-error';  // Included with Angular CLI.\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- ../DonateCraftNG/src/environments/environment.ts	(revision 5629631f204d029131cbd33f5c888b9735aa0719)
++++ ../DonateCraftNG/src/environments/environment.ts	(date 1614419056463)
+@@ -1,16 +1,6 @@
+-// This file can be replaced during build by using the `fileReplacements` array.
+-// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
+-// The list of file replacements can be found in `angular.json`.
+-
+ export const environment = {
+-  production: false
++  production: false,
++  apiUrl: 'http://localhost:8000/',
++  justGivingAPIUrl: 'https://api.staging.justgiving.com/redacted/v1',
++  justGivingDonateUrl: 'https://link.staging.justgiving.com/v1/charity/donate/charityId/'
+ };
+-
+-/*
+- * For easier debugging in development mode, you can import the following file
+- * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
+- *
+- * This import should be commented out in production mode because it will have a negative impact
+- * on performance if an error is thrown.
+- */
+-// import 'zone.js/dist/zone-error';  // Included with Angular CLI.
+Index: ../DonateCraftNG/src/environments/environment.prod.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>export const environment = {\r\n  production: true\r\n};\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- ../DonateCraftNG/src/environments/environment.prod.ts	(revision 5629631f204d029131cbd33f5c888b9735aa0719)
++++ ../DonateCraftNG/src/environments/environment.prod.ts	(date 1614419364196)
+@@ -1,3 +1,8 @@
+ export const environment = {
+-  production: true
++  production: true,
++  apiUrl: '/',
++  // Until we're completely happy with the flow and has been tested enough
++  // Prod file will still reference staging. Can change once we're actively playing
++  justGivingAPIUrl: 'https://api.staging.justgiving.com/redacted/v1',
++  justGivingDonateUrl: 'https://link.staging.justgiving.com/v1/charity/donate/charityId/'
+ };

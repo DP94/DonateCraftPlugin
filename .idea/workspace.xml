@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="DonateCraft:jar" />
+    </artifacts-to-build>
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="a5b4a3ee-b8d1-4bc2-9cf2-d26c7a52130f" name="Default Changelist" comment="Upgrade Github actions JDK">
+      <change afterPath="$PROJECT_DIR$/dependency-reduced-pom.xml" afterDir="false" />
+    </list>
+    <list id="865138be-2a83-4c4f-87bf-7b1e40668c15" name="Passwords" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Enum" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/.." value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    <option name="UPDATE_TYPE" value="REBASE" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="useMavenConfig" value="true" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="1otgLGSWO8dHoSKKBE73vDvUpKm" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <OptionsSetting value="false" id="Update" />
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="autoscrollToSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../DonateCraftNode" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="MavenSettings" />
+    <property name="ts.external.directory.path" value="C:\Program Files\IntelliJ\IntelliJ IDEA 2020.3.2\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Dan\IdeaProjects\DonateCraft\src\main\resources" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Maven.DonateCraft [clean,install]">
+    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="TEST_OBJECT" value="CLASS" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="All in DonateCraft" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="DonateCraft" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="PlayerListenerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="DonateCraft" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.vypersw.listeners.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.vypersw.listeners" />
+      <option name="MAIN_CLASS_NAME" value="com.vypersw.listeners.PlayerListenerTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ReanimationProtocolTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="DonateCraft" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.vypersw.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.vypersw" />
+      <option name="MAIN_CLASS_NAME" value="com.vypersw.ReanimationProtocolTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="VoteManagerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="DonateCraft" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.vypersw.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.vypersw" />
+      <option name="MAIN_CLASS_NAME" value="com.vypersw.VoteManagerTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="VoteManagerTest.testIsVoteActiveReturnsTrueWhenVoteIsNotNull" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="DonateCraft" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.vypersw.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.vypersw" />
+      <option name="MAIN_CLASS_NAME" value="com.vypersw.VoteManagerTest" />
+      <option name="METHOD_NAME" value="testIsVoteActiveReturnsTrueWhenVoteIsNotNull" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DonateCraft [clean,install]" type="MavenRunConfiguration" factoryName="Maven" nameIsGenerated="true">
+      <MavenSettings>
+        <option name="myGeneralSettings" />
+        <option name="myRunnerSettings" />
+        <option name="myRunnerParameters">
+          <MavenRunnerParameters>
+            <option name="profiles">
+              <set />
+            </option>
+            <option name="goals">
+              <list>
+                <option value="clean" />
+                <option value="install" />
+              </list>
+            </option>
+            <option name="pomFileName" />
+            <option name="profilesMap">
+              <map />
+            </option>
+            <option name="resolveToWorkspace" value="false" />
+            <option name="workingDirPath" value="$PROJECT_DIR$" />
+          </MavenRunnerParameters>
+        </option>
+      </MavenSettings>
+      <method v="2" />
+    </configuration>
+    <configuration name="Debug plugin" type="Remote">
+      <module name="DonateCraft" />
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+      <option name="AUTO_RESTART" value="false" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="5005" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="JUnit.All in DonateCraft" />
+      <item itemvalue="Maven.DonateCraft [clean,install]" />
+      <item itemvalue="Remote JVM Debug.Debug plugin" />
+      <item itemvalue="JUnit.PlayerListenerTest" />
+      <item itemvalue="JUnit.ReanimationProtocolTest" />
+      <item itemvalue="JUnit.VoteManagerTest.testIsVoteActiveReturnsTrueWhenVoteIsNotNull" />
+      <item itemvalue="JUnit.VoteManagerTest" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JUnit.VoteManagerTest" />
+        <item itemvalue="JUnit.VoteManagerTest.testIsVoteActiveReturnsTrueWhenVoteIsNotNull" />
+        <item itemvalue="JUnit.ReanimationProtocolTest" />
+        <item itemvalue="JUnit.PlayerListenerTest" />
+        <item itemvalue="JUnit.All in DonateCraft" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="a5b4a3ee-b8d1-4bc2-9cf2-d26c7a52130f" name="Default Changelist" comment="" />
+      <changelist id="865138be-2a83-4c4f-87bf-7b1e40668c15" name="Passwords" comment="" />
+      <created>1614111243219</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1614111243219</updated>
+      <workItem from="1614111244453" duration="265000" />
+      <workItem from="1614111544968" duration="4591000" />
+      <workItem from="1614118358458" duration="1017000" />
+      <workItem from="1614193687936" duration="1169000" />
+      <workItem from="1614199491779" duration="5510000" />
+      <workItem from="1614286300978" duration="8081000" />
+      <workItem from="1614331308866" duration="1488000" />
+      <workItem from="1614357369068" duration="3477000" />
+      <workItem from="1614419416308" duration="1992000" />
+      <workItem from="1614441269397" duration="7638000" />
+      <workItem from="1614550018899" duration="1868000" />
+      <workItem from="1614616653515" duration="6525000" />
+      <workItem from="1614633806523" duration="4012000" />
+      <workItem from="1614699466213" duration="596000" />
+      <workItem from="1614714391852" duration="75000" />
+      <workItem from="1614717813109" duration="4352000" />
+      <workItem from="1614726866929" duration="7328000" />
+      <workItem from="1614767883348" duration="2077000" />
+      <workItem from="1614782085811" duration="1181000" />
+      <workItem from="1614791586020" duration="564000" />
+      <workItem from="1614797817717" duration="4612000" />
+      <workItem from="1614873785023" duration="212000" />
+      <workItem from="1614874163574" duration="3874000" />
+      <workItem from="1614890885171" duration="1903000" />
+      <workItem from="1614896701441" duration="4866000" />
+      <workItem from="1614903750387" duration="2881000" />
+      <workItem from="1614952161463" duration="595000" />
+      <workItem from="1614954271260" duration="2892000" />
+      <workItem from="1615061270360" duration="8478000" />
+      <workItem from="1615148892587" duration="1574000" />
+      <workItem from="1615234121296" duration="11611000" />
+      <workItem from="1615317993542" duration="5548000" />
+      <workItem from="1615403838557" duration="3108000" />
+      <workItem from="1615490294757" duration="2082000" />
+      <workItem from="1615580967038" duration="4928000" />
+    </task>
+    <task id="LOCAL-00001" summary="Passwords">
+      <created>1614420453835</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1614420453835</updated>
+    </task>
+    <task id="LOCAL-00002" summary="#11: Remove all hardcoded URL references">
+      <created>1614420741180</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1614420741180</updated>
+    </task>
+    <task id="LOCAL-00003" summary="#11: Remove all hardcoded URL references - add artifact">
+      <created>1614421146422</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1614421146422</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Add a DB pool for TypeORM to pick from to resolve connection issues">
+      <created>1614552372022</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1614552372022</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Couple of quality of life improvements">
+      <created>1614645245840</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1614645245840</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Couple of quality of life improvements">
+      <created>1614645270715</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1614645270715</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Remove use of deprecated variables">
+      <created>1614721226437</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1614721226437</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Purposefully fail compilation to see if checks fail">
+      <created>1614721297209</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1614721297209</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Revert: Purposefully fail compilation to see if checks fail">
+      <created>1614721372836</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1614721372836</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Remove use of deprecated variables">
+      <created>1614721544654</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1614721544654</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Move tests into test package">
+      <created>1614722310523</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1614722310523</updated>
+    </task>
+    <task id="LOCAL-00012" summary="#15 On respawn teleport player to spawn">
+      <created>1614730392581</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1614730392581</updated>
+    </task>
+    <task id="LOCAL-00013" summary="#15 On respawn teleport player to spawn">
+      <created>1614731361158</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1614731361158</updated>
+    </task>
+    <task id="LOCAL-00014" summary="#15 On respawn teleport player to spawn - refactor code to make it easier to test">
+      <created>1614734561678</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1614734561678</updated>
+    </task>
+    <task id="LOCAL-00015" summary="#18 Show a success or failure message once JustGiving has redirected">
+      <created>1614784119319</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1614784119319</updated>
+    </task>
+    <task id="LOCAL-00016" summary="#19 Decimal place issues in revival message">
+      <created>1614874518425</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1614874518425</updated>
+    </task>
+    <task id="LOCAL-00017" summary="#47: Add a voting system">
+      <created>1615244174024</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1615244174024</updated>
+    </task>
+    <task id="LOCAL-00018" summary="#47: Add a voting system">
+      <created>1615245188422</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1615245188422</updated>
+    </task>
+    <task id="LOCAL-00019" summary="#47: Add a voting system - add node support to persist votes">
+      <created>1615323330417</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1615323330417</updated>
+    </task>
+    <task id="LOCAL-00020" summary="Update to Java 18, upgrade to JUnit 5, upgrade Mockito to v4">
+      <created>1648930839093</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1648930839093</updated>
+    </task>
+    <task id="LOCAL-00021" summary="Revert JUnit 5 change">
+      <created>1649706453072</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1649706453072</updated>
+    </task>
+    <task id="LOCAL-00022" summary="Revert JUnit 5 change">
+      <created>1649706552124</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1649706552124</updated>
+    </task>
+    <task id="LOCAL-00023" summary="Upgrade Github actions JDK">
+      <created>1649706700393</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1649706700393</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="CUSTOM_BOOLEAN_PROPERTIES">
+                <map>
+                  <entry key="Show.Git.Branches" value="false" />
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="Passwords" />
+    <MESSAGE value="a" />
+    <MESSAGE value="#11: Remove all hardcoded URL references" />
+    <MESSAGE value="#11: Remove all hardcoded URL references - add artifact" />
+    <MESSAGE value="Add a DB pool for TypeORM to pick from to resolve connection issues" />
+    <MESSAGE value="Couple of quality of life improvements" />
+    <MESSAGE value="Purposefully fail compilation to see if checks fail" />
+    <MESSAGE value="Revert: Purposefully fail compilation to see if checks fail" />
+    <MESSAGE value="Remove use of deprecated variables" />
+    <MESSAGE value="Move tests into test package" />
+    <MESSAGE value="#15 On respawn teleport player to spawn" />
+    <MESSAGE value="#15 On respawn teleport player to spawn - refactor code to make it easier to test" />
+    <MESSAGE value="#18 Show a success or failure message once JustGiving has redirected" />
+    <MESSAGE value="#19 Decimal place issues in revival message" />
+    <MESSAGE value="#47: Add a voting system" />
+    <MESSAGE value="#47: Add a voting system - add node support to persist votes" />
+    <MESSAGE value="Update to Java 18, upgrade to JUnit 5, upgrade Mockito to v4" />
+    <MESSAGE value="Revert JUnit 5 change" />
+    <MESSAGE value="Upgrade Github actions JDK" />
+    <option name="LAST_COMMIT_MESSAGE" value="Upgrade Github actions JDK" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/DonateCraft$ReanimationProtocolTest.ic" NAME="ReanimationProtocolTest Coverage Results" MODIFIED="1614729425859" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>com.vypersw.*</FILTER>
+    </SUITE>
+    <SUITE FILE_PATH="coverage/DonateCraft$MessageHelperTest.ic" NAME="MessageHelperTest Coverage Results" MODIFIED="1614719130956" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>com.vypersw.*</FILTER>
+    </SUITE>
+    <SUITE FILE_PATH="coverage/DonateCraft$com_vypersw_in_DonateCraft.ic" NAME="com.vypersw in DonateCraft Coverage Results" MODIFIED="1614729961771" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>com.vypersw.*</FILTER>
+    </SUITE>
+    <SUITE FILE_PATH="coverage/DonateCraft$VoteManagerTest_testIsVoteActiveReturnsTrueWhenVoteIsNotNull.ic" NAME="VoteManagerTest.testIsVoteActiveReturnsTrueWhenVoteIsNotNull Coverage Results" MODIFIED="1649360093061" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>com.vypersw.*</FILTER>
+    </SUITE>
+    <SUITE FILE_PATH="coverage/DonateCraft$VoteCommandsTest.ic" NAME="VoteCommandsTest Coverage Results" MODIFIED="1615243601688" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>com.vypersw.command.*</FILTER>
+    </SUITE>
+    <SUITE FILE_PATH="coverage/DonateCraft$All_in_DonateCraft.ic" NAME="All in DonateCraft Coverage Results" MODIFIED="1615245168377" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+  </component>
+</project>

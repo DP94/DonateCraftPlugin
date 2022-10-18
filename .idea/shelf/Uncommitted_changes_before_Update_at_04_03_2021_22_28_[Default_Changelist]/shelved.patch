@@ -1,0 +1,162 @@
+Index: src/main/java/com/vypersw/ReanimationProtocol.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.vypersw;\r\n\r\nimport com.fasterxml.jackson.databind.ObjectMapper;\r\nimport com.vypersw.network.HttpHelper;\r\nimport com.vypersw.response.Revival;\r\nimport org.bukkit.*;\r\nimport org.bukkit.entity.Player;\r\n\r\nimport java.net.http.HttpClient;\r\nimport java.net.http.HttpRequest;\r\nimport java.net.http.HttpResponse;\r\nimport java.util.HashSet;\r\nimport java.util.Set;\r\nimport java.util.UUID;\r\nimport java.util.concurrent.BlockingQueue;\r\nimport java.util.concurrent.LinkedBlockingQueue;\r\n\r\npublic class ReanimationProtocol implements Runnable {\r\n\r\n    private final Server server;\r\n    private BlockingQueue<UUID> toRevive = new LinkedBlockingQueue<>();\r\n    private final MessageHelper messageHelper;\r\n    private final HttpHelper httpHelper;\r\n\r\n    public ReanimationProtocol(Server server, MessageHelper messageHelper, HttpHelper httpHelper) {\r\n        this.server = server;\r\n        this.messageHelper = messageHelper;\r\n        this.httpHelper = httpHelper;\r\n    }\r\n\r\n    @Override\r\n    public void run() {\r\n        reanimateEligiblePlayers();\r\n    }\r\n\r\n    private void reanimateEligiblePlayers() {\r\n        HttpRequest request = httpHelper.buildGETHttpRequest(\"/unlocked\");\r\n        HttpClient client = HttpClient.newBuilder().build();\r\n        client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenAccept(asyncResponse -> {\r\n            ObjectMapper objectMapper = new ObjectMapper();\r\n            try {\r\n                RevivalResponse response = objectMapper.readerFor(RevivalResponse.class).readValue(asyncResponse.body());\r\n                if (response.getRevivals() != null && !response.getRevivals().isEmpty()) {\r\n                    for (Revival revival : response.getRevivals()) {\r\n                        UUID uuid = UUID.fromString(revival.getKey());\r\n                        Player player = server.getPlayer(uuid);\r\n                        if (player != null && player.getGameMode() == GameMode.SPECTATOR) {\r\n                            server.broadcastMessage(messageHelper.getDonationMessageFromRevival(player, revival));\r\n                            toRevive.offer(uuid);\r\n                        }\r\n                    }\r\n                }\r\n            } catch (Exception e) {\r\n                e.printStackTrace();\r\n            }\r\n        });\r\n\r\n        Set<UUID> uuids = new HashSet<>();\r\n        toRevive.drainTo(uuids);\r\n        for (UUID uuid : uuids) {\r\n            reanimatePlayer(uuid);\r\n        }\r\n    }\r\n\r\n    public void reanimatePlayer(UUID uuid) {\r\n        Player player = server.getPlayer(uuid);\r\n        Revival revival = new Revival();\r\n        revival.setKey(uuid.toString());\r\n        //Extra checks just in case Minecraft has pinged the server again before our async call has come back\r\n        if (player != null && player.isOnline() && (player.isDead() || player.getGameMode() == GameMode.SPECTATOR)) {\r\n            server.getLogger().info(\"Attempting to revive \" + player.getName());\r\n            World currentPlayerWorld = player.getWorld();\r\n            if (player.getBedSpawnLocation() == null) {\r\n                player.teleport(currentPlayerWorld.getSpawnLocation());\r\n            } else {\r\n                player.teleport(player.getBedSpawnLocation());\r\n            }\r\n            currentPlayerWorld.strikeLightningEffect(player.getLocation());\r\n            currentPlayerWorld.playEffect(player.getLocation(), Effect.SMOKE, 0, 100);\r\n            server.broadcastMessage(ChatColor.GOLD + player.getName() + \" \" + ChatColor.GREEN + \"has been revived!\");\r\n            player.setGameMode(GameMode.SURVIVAL);\r\n            httpHelper.fireAsyncPostRequestToServer(\"/revived\", revival);\r\n        } else if (player != null && player.isOnline() && !player.isDead()) {\r\n            httpHelper.fireAsyncPostRequestToServer(\"/revived\", revival);\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/com/vypersw/ReanimationProtocol.java b/src/main/java/com/vypersw/ReanimationProtocol.java
+--- a/src/main/java/com/vypersw/ReanimationProtocol.java	
++++ b/src/main/java/com/vypersw/ReanimationProtocol.java	
+@@ -76,7 +76,8 @@
+                 player.teleport(player.getBedSpawnLocation());
+             }
+             currentPlayerWorld.strikeLightningEffect(player.getLocation());
+-            currentPlayerWorld.playEffect(player.getLocation(), Effect.SMOKE, 0, 100);
++            currentPlayerWorld.playEffect(player.getLocation(), Effect.SMOKE, 0, 1000);
++            currentPlayerWorld.playEffect(player.getLocation(), Effect.POTION_BREAK, 0, 1000);
+             server.broadcastMessage(ChatColor.GOLD + player.getName() + " " + ChatColor.GREEN + "has been revived!");
+             player.setGameMode(GameMode.SURVIVAL);
+             httpHelper.fireAsyncPostRequestToServer("/revived", revival);
+Index: ../DonateCraftNode/.env
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>DC_DB_USERNAME=db_user\r\nDC_DB_PASSWORD=db_pass\r\nDC_JG_API_KEY=apikey\r\nDC_EXTERNAL_HOST=http://localhost:8000\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/../DonateCraftNode/.env b/../DonateCraftNode/.env
+--- a/../DonateCraftNode/.env	
++++ b/../DonateCraftNode/.env	
+@@ -1,4 +1,4 @@
+-DC_DB_USERNAME=db_user
+-DC_DB_PASSWORD=db_pass
+-DC_JG_API_KEY=apikey
++DC_DB_USERNAME=root
++DC_DB_PASSWORD=Vnd^}]GZiyGxdAi]i*b&&r6P
++DC_JG_API_KEY=296a9290
+ DC_EXTERNAL_HOST=http://localhost:8000
+Index: ../DonateCraftNode/src/entities/player.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import {Column, Entity, OneToMany, PrimaryColumn} from 'typeorm';\r\nimport {Donation} from \"./donation\";\r\n\r\n@Entity()\r\nexport class Player {\r\n\r\n    @PrimaryColumn()\r\n    uuid!: string;\r\n\r\n    @Column()\r\n    deathcount!: number;\r\n\r\n    @Column()\r\n    name!: string;\r\n\r\n    @Column()\r\n    lastdeathreason!: string;\r\n\r\n    @OneToMany(() => Donation, donation => donation.uuid, {\r\n        eager: true\r\n    })\r\n    donations?: Donation[];\r\n\r\n    constructor() {\r\n        this.deathcount = 0;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/../DonateCraftNode/src/entities/player.ts b/../DonateCraftNode/src/entities/player.ts
+--- a/../DonateCraftNode/src/entities/player.ts	
++++ b/../DonateCraftNode/src/entities/player.ts	
+@@ -14,7 +14,7 @@
+     name!: string;
+ 
+     @Column()
+-    lastdeathreason!: string;
++    lastDeathReason!: string;
+ 
+     @OneToMany(() => Donation, donation => donation.uuid, {
+         eager: true
+Index: ../DonateCraftNG/src/app/response/player.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import {Donation} from './donation';\r\n\r\nexport class Player {\r\n  deathcount: number;\r\n  uuid: string;\r\n  id: number;\r\n  name: string;\r\n  lastdeathreason: string;\r\n  donations: Donation[];\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/../DonateCraftNG/src/app/response/player.ts b/../DonateCraftNG/src/app/response/player.ts
+--- a/../DonateCraftNG/src/app/response/player.ts	
++++ b/../DonateCraftNG/src/app/response/player.ts	
+@@ -5,6 +5,6 @@
+   uuid: string;
+   id: number;
+   name: string;
+-  lastdeathreason: string;
++  lastDeathReason: string;
+   donations: Donation[];
+ }
+Index: ../DonateCraftNG/src/app/deaths/deaths.component.html
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><div class=\"table-responsive\">\r\n  <table *ngIf=\"deaths\" class=\"table table-striped table-bordered table-hover h-100\">\r\n    <thead>\r\n    <tr>\r\n      <th scope=\"col\" class=\"death-table-header\">Player</th>\r\n      <th scope=\"col\" class=\"death-table-header\">Last death reason</th>\r\n      <th scope=\"col\" class=\"death-table-header\">Deaths</th>\r\n      <th scope=\"col\" class=\"death-table-header\">Donation total</th>\r\n    </tr>\r\n    </thead>\r\n    <tbody class=\"h-100\">\r\n    <tr scope=\"row\" *ngFor=\"let death of deaths\" class=\"death-row h-100\">\r\n      <td class=\"h-100\"><img src='https://crafatar.com/avatars/{{ death.uuid}}'/><span> {{ death.name }}</span></td>\r\n      <td class=\"last-death-reason h-100\"><span>{{ death.lastdeathreason }}</span></td>\r\n      <td class=\"h-100 death-count\"><span>{{ death.deathcount }}</span></td>\r\n      <td class=\"h-100 donation-count\"><span>£{{ getTotalDonationsForPlayer(death.donations)}}</span></td>\r\n    </tr>\r\n    </tbody>\r\n  </table>\r\n  <app-modal #modal></app-modal>\r\n</div>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/../DonateCraftNG/src/app/deaths/deaths.component.html b/../DonateCraftNG/src/app/deaths/deaths.component.html
+--- a/../DonateCraftNG/src/app/deaths/deaths.component.html	
++++ b/../DonateCraftNG/src/app/deaths/deaths.component.html	
+@@ -11,7 +11,7 @@
+     <tbody class="h-100">
+     <tr scope="row" *ngFor="let death of deaths" class="death-row h-100">
+       <td class="h-100"><img src='https://crafatar.com/avatars/{{ death.uuid}}'/><span> {{ death.name }}</span></td>
+-      <td class="last-death-reason h-100"><span>{{ death.lastdeathreason }}</span></td>
++      <td class="last-death-reason h-100"><span>{{ death.lastDeathReason }}</span></td>
+       <td class="h-100 death-count"><span>{{ death.deathcount }}</span></td>
+       <td class="h-100 donation-count"><span>£{{ getTotalDonationsForPlayer(death.donations)}}</span></td>
+     </tr>
+Index: ../DonateCraftNode/src/index.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import express from 'express';\r\nimport {createConnection, getManager} from 'typeorm';\r\nimport {Player} from './entities/player';\r\nimport {RevivalLock} from './entities/RevivalLock';\r\nimport bodyParser from 'body-parser';\r\nimport cors from 'cors';\r\nimport {PlayersDto} from \"./dtos/players.dto\";\r\nimport path from \"path\";\r\nimport http from 'http';\r\nimport {RevivalsDto} from \"./dtos/revivals.dto\";\r\nimport {Donation} from \"./entities/donation\";\r\n\r\nconst util = require('util')\r\nrequire('dotenv').config()\r\n\r\nconst DC_DB_USERNAME = process.env.DC_DB_USERNAME;\r\nconst DC_DB_PASSWORD = process.env.DC_DB_PASSWORD;\r\nconst DC_JG_API_KEY = process.env.DC_JG_API_KEY;\r\nif (!DC_DB_USERNAME) {\r\n    console.error(\"DC_DB_USERNAME not set\");\r\n    process.exit(-1);\r\n}\r\nif (!DC_DB_PASSWORD) {\r\n    console.error(\"DC_DB_PASSWORD not set\");\r\n    process.exit(-1);\r\n}\r\nif (!DC_JG_API_KEY) {\r\n    console.error(\"DC_JG_API_KEY not set\");\r\n    process.exit(-1);\r\n}\r\nconst app = express();\r\nconst PORT = 8000;\r\nconst jsonParser = bodyParser.json();\r\n\r\nconnectToDB().then(async () => {\r\n    app.use(cors());\r\n    app.use(express.static(process.cwd() + \"/build/public/\"));\r\n    app.listen(PORT, () => {\r\n        console.log(`Server is running at http://localhost:${PORT}`);\r\n    });\r\n\r\n    app.get('/', (request, response) => {\r\n        response.sendFile(path.resolve(__dirname, 'build', 'index.html'));\r\n    });\r\n\r\n    app.get('/players', jsonParser, async (request, response) => {\r\n        try {\r\n            const deathRepository = getManager().getRepository(Player);\r\n            const players: Player[] = await deathRepository.find({\r\n                order: {\r\n                    deathcount: \"DESC\",\r\n                    lastdeathreason: \"DESC\"\r\n                }\r\n            });\r\n            const playersDTO: PlayersDto = new PlayersDto();\r\n            playersDTO.players = players;\r\n            response.setHeader('Content-Type', 'application/json');\r\n            response.end(JSON.stringify(playersDTO));\r\n        } catch (e) {\r\n            console.log(e);\r\n        }\r\n    });\r\n    // Revival API\r\n\r\n    //GET to see if a lock exists or not\r\n    app.get('/lock/:id', jsonParser, async (request, response) => {\r\n        const key = request.params.id;\r\n        if (key === undefined) {\r\n            return;\r\n        }\r\n        const revivalRepository = getManager().getRepository(RevivalLock);\r\n        let revivalLock: RevivalLock | undefined = await revivalRepository.findOne({key: key});\r\n        if (revivalLock === undefined || revivalLock === null) {\r\n            response.end(JSON.stringify(false));\r\n        } else {\r\n            response.end(JSON.stringify(true));\r\n        }\r\n        return;\r\n    });\r\n\r\n    app.post('/lock', jsonParser, async (request, response) => {\r\n        const data: Player = request.body.death;\r\n        // Register key into DB\r\n        try {\r\n            try {\r\n                const deathRepository = getManager().getRepository(Player);\r\n                let death: Player | undefined = await deathRepository.findOne({uuid: data.uuid})\r\n                if (death === undefined) {\r\n                    death = new Player();\r\n                    death.uuid = data.uuid;\r\n                }\r\n                death.name = data.name;\r\n                death.lastdeathreason = data.lastdeathreason;\r\n                death.deathcount++;\r\n                await getManager().save(death);\r\n            } catch (e) {\r\n                console.log('Encountered issue when trying to persist user stats!');\r\n                console.log(e);\r\n            }\r\n\r\n            const lockRepository = getManager().getRepository(RevivalLock);\r\n            let lock: RevivalLock | undefined = await lockRepository.findOne({key: data.uuid})\r\n            if (lock === undefined) {\r\n                lock = new RevivalLock();\r\n                lock.key = data.uuid;\r\n                lock.unlocked = false;\r\n                await getManager().save(lock);\r\n                response.send('test');\r\n            } else {\r\n                response.status(400).send('Lock already exists')\r\n            }\r\n        } catch (e) {\r\n            console.log(e);\r\n        }\r\n    });\r\n\r\n    app.get('/unlocked', jsonParser, async (request, response) => {\r\n        try {\r\n            const lockRepository = getManager().getRepository(RevivalLock);\r\n            let lock: RevivalLock[] | undefined = await lockRepository.find({unlocked: true});\r\n            const revivals: RevivalsDto = new RevivalsDto();\r\n            revivals.revivals = lock;\r\n            response.setHeader('Content-Type', 'application/json');\r\n            response.end(JSON.stringify(revivals));\r\n        } catch (e) {\r\n            console.log(e);\r\n        }\r\n    });\r\n\r\n    app.post('/revived', jsonParser, async (request, response) => {\r\n        const uuid = request.body.revival.key;\r\n        try {\r\n            const lockRepository = getManager().getRepository(RevivalLock);\r\n            let lock: RevivalLock | undefined = await lockRepository.findOne({key: uuid});\r\n            if (lock === undefined) {\r\n                response.status(404).send(\"Player lock not found!\");\r\n            } else if (lock.unlocked) {\r\n                await lockRepository.remove(lock);\r\n            }\r\n        } catch (e) {\r\n            console.log(e);\r\n        }\r\n    });\r\n\r\n    app.get('/callback', jsonParser, async (request, response) => {\r\n        const data = request.query.data as string;\r\n        if (data === undefined || !data.includes(\"|\")) {\r\n            response.status(404).send(\"Data from callback is not correct: \" + data);\r\n            return;\r\n        }\r\n        const dataSplit = data.split(\"|\");\r\n        if (dataSplit.length < 2) {\r\n            response.status(404).send(\"Not enough data found in callback: \" + dataSplit);\r\n            return;\r\n        }\r\n        const donationid = dataSplit[0];\r\n        const key = dataSplit[1];\r\n        if (!donationid) {\r\n            response.status(404).send(\"No donation id found\");\r\n            return;\r\n        }\r\n        const donationData = await util.promisify(fireGetJSONRequest)(`api.staging.justgiving.com`, `/${DC_JG_API_KEY}/v1/donation/${donationid}`);\r\n        if (donationData && donationData.status && donationData.status.length > 0) {\r\n            try {\r\n                // If data is returned and we have a status\r\n                if (data && donationData.status && donationData.status.length > 0) {\r\n                    const status = donationData.status;\r\n                    // We can also unlock now that the donation is accepted and hits the minimum value to avoid future calls.\r\n                    if (status === \"Accepted\" || status === \"Pending\") {\r\n                        const lockRepository = getManager().getRepository(RevivalLock);\r\n                        let lock: RevivalLock | undefined = await lockRepository.findOne({key: key})\r\n                        if (lock === undefined) {\r\n                            //In the event of someone donating when no lock is present\r\n                            response.redirect('/#/?status=success');\r\n                            return;\r\n                        } else if (!lock.unlocked) {\r\n                            const donationRepository = getManager().getRepository(Donation);\r\n                            const donation = new Donation();\r\n                            donation.donationId = parseInt(donationid);\r\n                            donation.amount = donationData.amount;\r\n                            donation.charity = donationData.charityId;\r\n                            donation.uuid = key;\r\n\r\n                            const charityData = await util.promisify(fireGetJSONRequest)('api.staging.justgiving.com', `/${DC_JG_API_KEY}/v1/charity/${donation.charity}`);\r\n                            donation.charityName = charityData.name;\r\n                            donation.date = new Date();\r\n\r\n                            await donationRepository.save(donation);\r\n                            lock.donation = donation;\r\n                            lock.unlocked = true;\r\n                            await getManager().save(lock);\r\n                            response.redirect('/#/?status=success');\r\n                            return;\r\n                        } else {\r\n                            response.redirect('/#/?status=success');\r\n                            return;\r\n                        }\r\n                    } else if (status === \"Failed\" || status === \"Cancelled\") {\r\n                        response.redirect(`/#/?status=error&key=${key}`);\r\n                        return;\r\n                    }\r\n                }\r\n            } catch (e) {\r\n                console.log(e);\r\n            }\r\n        }\r\n    })\r\n}).then((error) => console.log(error));\r\n\r\nfunction fireGetJSONRequest(host: string, path: string, callback: Function) {\r\n    const options = {\r\n        host: host,\r\n        path: path,\r\n        headers: {'Content-Type': 'application/json'},\r\n        method: 'GET',\r\n    }\r\n    console.log(`Firing request to ${host}${path}`);\r\n    http.get(options, (res: http.IncomingMessage) => {\r\n        let json = '';\r\n\r\n        res.on('data', function (chunk: string) {\r\n            json += chunk;\r\n        });\r\n\r\n        res.on('error', function (e: string) {\r\n            callback(e, null);\r\n        });\r\n\r\n        res.on('timeout', function (e: string) {\r\n            callback(e, null);\r\n        });\r\n\r\n        res.on('end', function () {\r\n            json = JSON.parse(json);\r\n            callback(null, json);\r\n        });\r\n    });\r\n}\r\n\r\nfunction connectToDB() {\r\n    return createConnection({\r\n        type: \"mysql\",\r\n        host: \"localhost\",\r\n        port: 3306,\r\n        username: DC_DB_USERNAME,\r\n        password: DC_DB_PASSWORD,\r\n        database: \"donatecraft\",\r\n        entities: [\r\n            Player, Donation, RevivalLock\r\n        ],\r\n        synchronize: true,\r\n        logging: false,\r\n        bigNumberStrings: false,\r\n    });\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/../DonateCraftNode/src/index.ts b/../DonateCraftNode/src/index.ts
+--- a/../DonateCraftNode/src/index.ts	
++++ b/../DonateCraftNode/src/index.ts	
+@@ -49,7 +49,7 @@
+             const players: Player[] = await deathRepository.find({
+                 order: {
+                     deathcount: "DESC",
+-                    lastdeathreason: "DESC"
++                    lastDeathReason: "DESC",
+                 }
+             });
+             const playersDTO: PlayersDto = new PlayersDto();
+@@ -90,7 +90,7 @@
+                     death.uuid = data.uuid;
+                 }
+                 death.name = data.name;
+-                death.lastdeathreason = data.lastdeathreason;
++                death.lastDeathReason = data.lastDeathReason;
+                 death.deathcount++;
+                 await getManager().save(death);
+             } catch (e) {
+Index: ../DonateCraftNG/src/environments/environment.prod.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>export const environment = {\r\n  production: true,\r\n  apiUrl: '/',\r\n  fullAPIUrl: 'http://localhost:8000/',\r\n  // Until we're completely happy with the flow and has been tested enough\r\n  // Prod file will still reference staging. Can change once we're actively playing\r\n  justGivingAPIUrl: 'https://api.staging.justgiving.com/redacted/v1',\r\n  justGivingDonateUrl: 'https://link.staging.justgiving.com/v1/charity/donate/charityId/'\r\n};\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/../DonateCraftNG/src/environments/environment.prod.ts b/../DonateCraftNG/src/environments/environment.prod.ts
+--- a/../DonateCraftNG/src/environments/environment.prod.ts	
++++ b/../DonateCraftNG/src/environments/environment.prod.ts	
+@@ -1,9 +1,9 @@
+ export const environment = {
+   production: true,
+   apiUrl: '/',
+-  fullAPIUrl: 'http://localhost:8000/',
++  fullAPIUrl: 'http://86.168.247.27:8000/',
+   // Until we're completely happy with the flow and has been tested enough
+   // Prod file will still reference staging. Can change once we're actively playing
+-  justGivingAPIUrl: 'https://api.staging.justgiving.com/redacted/v1',
++  justGivingAPIUrl: 'https://api.staging.justgiving.com/296a9290/v1',
+   justGivingDonateUrl: 'https://link.staging.justgiving.com/v1/charity/donate/charityId/'
+ };
+Index: ../DonateCraftNG/src/environments/environment.ts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>export const environment = {\r\n  production: false,\r\n  apiUrl: 'http://localhost:8000/',\r\n  fullAPIUrl: 'http://localhost:8000/',\r\n  justGivingAPIUrl: 'https://api.staging.justgiving.com/redacted/v1',\r\n  justGivingDonateUrl: 'https://link.staging.justgiving.com/v1/charity/donate/charityId/'\r\n};\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/../DonateCraftNG/src/environments/environment.ts b/../DonateCraftNG/src/environments/environment.ts
+--- a/../DonateCraftNG/src/environments/environment.ts	
++++ b/../DonateCraftNG/src/environments/environment.ts	
+@@ -2,6 +2,6 @@
+   production: false,
+   apiUrl: 'http://localhost:8000/',
+   fullAPIUrl: 'http://localhost:8000/',
+-  justGivingAPIUrl: 'https://api.staging.justgiving.com/redacted/v1',
++  justGivingAPIUrl: 'https://api.staging.justgiving.com/296a9290/v1',
+   justGivingDonateUrl: 'https://link.staging.justgiving.com/v1/charity/donate/charityId/'
+ };

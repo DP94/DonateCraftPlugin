@@ -7,24 +7,24 @@ import java.util.UUID;
 
 @JsonRootName(value = "death")
 public class Death {
-    private UUID uuid;
-    private String name;
+    private UUID playerId;
+    private String playerName;
     private String reason;
 
-    public UUID getUuid() {
-        return uuid;
+    public UUID getPlayerId() {
+        return playerId;
     }
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
+    public void setPlayerId(UUID playerId) {
+        this.playerId = playerId;
     }
 
-    public String getName() {
-        return name;
+    public String getPlayerName() {
+        return playerName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
     }
 
     public String getReason() {
@@ -40,6 +40,6 @@ public class Death {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Death death = (Death) o;
-        return Objects.equals(uuid, death.uuid) && Objects.equals(name, death.name) && Objects.equals(reason, death.reason);
+        return Objects.equals(playerId, death.playerId) && Objects.equals(playerName, death.playerName) && Objects.equals(reason, death.reason);
     }
 }

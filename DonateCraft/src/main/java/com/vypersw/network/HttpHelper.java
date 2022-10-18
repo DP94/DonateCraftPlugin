@@ -2,6 +2,7 @@ package com.vypersw.network;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.json.JSONObject;
 
@@ -22,7 +23,7 @@ public class HttpHelper {
         String objectJSON = null;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
+            objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE);
             objectJSON = objectMapper.writeValueAsString(objectToMap);
 
             HttpRequest request = HttpRequest.newBuilder()
@@ -30,6 +31,7 @@ public class HttpHelper {
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(objectJSON))
                     .build();
+            System.out.println(serverURL + endPoint);
             HttpClient client = HttpClient.newBuilder().build();
             if (taskToRunAfterAsyncResponse != null) {
                 client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(HttpResponse::body).thenRun(taskToRunAfterAsyncResponse);

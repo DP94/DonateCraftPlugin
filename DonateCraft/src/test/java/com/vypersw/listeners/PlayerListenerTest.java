@@ -99,15 +99,15 @@ public class PlayerListenerTest {
   public void testOnPlayerDeath() {
     playerListener.onPlayerDeath(new PlayerDeathEvent(player, Collections.emptyList(), 0, DEATH_MESSAGE));
 
-    verify(httpHelper).fireAsyncPostRequestToServer(eq("/lock"), deathArgumentCaptor.capture(), runnableArgumentCaptor.capture());
+    verify(httpHelper).fireAsyncPostRequestToServer(eq("Death"), deathArgumentCaptor.capture(), runnableArgumentCaptor.capture());
     verifyNoMoreInteractions(httpHelper);
     Runnable runnable = runnableArgumentCaptor.getValue();
     runnable.run();
 
     Death death = deathArgumentCaptor.getValue();
     assertThat(death.getReason(), equalTo(DEATH_MESSAGE));
-    assertThat(death.getName(), equalTo(PLAYER_NAME));
-    assertThat(death.getUuid(), equalTo(PLAYER_UUID));
+    assertThat(death.getPlayerName(), equalTo(PLAYER_NAME));
+    assertThat(death.getPlayerId(), equalTo(PLAYER_UUID));
 
     verify(messageHelper).sendDeathURL(player);
     verifyNoMoreInteractions(messageHelper);
@@ -136,7 +136,6 @@ public class PlayerListenerTest {
 
     verifyNoInteractions(messageHelper);
     verify(player).getGameMode();
-    verifyNoMoreInteractions(player);
   }
 
   @Test
@@ -147,7 +146,6 @@ public class PlayerListenerTest {
     verify(messageHelper).sendDeathURL(player);
     verifyNoMoreInteractions(messageHelper);
     verify(player).getGameMode();
-    verifyNoMoreInteractions(player);
   }
 
 }

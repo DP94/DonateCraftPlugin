@@ -1,2 +1,2 @@
-backendUrl: http://localhost:8000
+backendUrl: http://localhost:5000/v1/
 frontendUrl: http://localhost:8000

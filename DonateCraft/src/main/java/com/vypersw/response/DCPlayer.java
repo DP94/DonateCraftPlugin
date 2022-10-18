@@ -3,22 +3,22 @@ package com.vypersw.response;
 import java.util.UUID;
 
 public class DCPlayer {
-    private UUID uuid;
+    private UUID id;
     private String name;
 
     public DCPlayer() {}
 
-    public DCPlayer(UUID uuid, String name) {
-        this.uuid = uuid;
+    public DCPlayer(UUID id, String name) {
+        this.id = id;
         this.name = name;
     }
 
-    public UUID getUuid() {
-        return uuid;
+    public UUID getId() {
+        return id;
     }
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public String getName() {

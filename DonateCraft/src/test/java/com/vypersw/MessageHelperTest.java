@@ -44,9 +44,9 @@ public class MessageHelperTest {
 
     @Before
     public void before() {
-        lenient().when(player.getName()).thenReturn("Test");
-        lenient().when(player.spigot()).thenReturn(spigotPlayer);
-        lenient().when(player.getUniqueId()).thenReturn(PLAYER_UUID);
+        when(player.getName()).thenReturn("Test");
+        when(player.spigot()).thenReturn(spigotPlayer);
+        when(player.getUniqueId()).thenReturn(PLAYER_UUID);
         messageHelper = new MessageHelper(SERVER_URL);
         revival = new Revival();
         revival.setId(1L);

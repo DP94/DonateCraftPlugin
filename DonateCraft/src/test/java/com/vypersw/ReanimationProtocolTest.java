@@ -53,8 +53,8 @@ public class ReanimationProtocolTest {
     public void before() {
         reanimationProtocol = new ReanimationProtocol(server, messageHelper, httpHelper);
         uuid = UUID.randomUUID();
-        lenient().when(server.getLogger()).thenReturn(logger);
-        lenient().when(server.getPlayer(uuid)).thenReturn(player);
+        when(server.getLogger()).thenReturn(logger);
+        when(server.getPlayer(uuid)).thenReturn(player);
         glowing = new PotionEffect(PotionEffectType.GLOWING, 200, 100, true, true);
         regen = new PotionEffect(PotionEffectType.REGENERATION, 200, 10, true, true);
         heal = new PotionEffect(PotionEffectType.HEAL, 200, 10, true, true);
@@ -63,14 +63,16 @@ public class ReanimationProtocolTest {
 
     @Test
     public void testThatPlayerWhoIsInSurvivalModeIsNotRevived() {
-        lenient().when(player.getGameMode()).thenReturn(GameMode.SURVIVAL);
+        when(player.getGameMode()).thenReturn(GameMode.SURVIVAL);
+        when(player.isOnline()).thenReturn(true);
         reanimationProtocol.reanimatePlayer(uuid);
         verify(player, never()).setGameMode(GameMode.SURVIVAL);
     }
 
     @Test
     public void testThatAlivePlayerIsNotRevived() {
-        lenient().when(player.isDead()).thenReturn(false);
+        when(player.isDead()).thenReturn(false);
+        when(player.isOnline()).thenReturn(true);
         reanimationProtocol.reanimatePlayer(uuid);
         verify(player, never()).setGameMode(GameMode.SURVIVAL);
     }

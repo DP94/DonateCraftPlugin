@@ -77,15 +77,15 @@ public class PlayerListenerTest {
 
   @Before
   public void before() {
-    lenient().when(player.getUniqueId()).thenReturn(PLAYER_UUID);
-    lenient().when(player.getName()).thenReturn(PLAYER_NAME);
-    lenient().when(player.getWorld()).thenReturn(world);
-    lenient().when(player.getLocation()).thenReturn(PLAYER_LOCATION);
+    when(player.getUniqueId()).thenReturn(PLAYER_UUID);
+    when(player.getName()).thenReturn(PLAYER_NAME);
+    when(player.getWorld()).thenReturn(world);
+    when(player.getLocation()).thenReturn(PLAYER_LOCATION);
     playerListener = new PlayerListener(messageHelper, httpHelper);
 
-    lenient().when(server.getLogger()).thenReturn(serverLogger);
-    lenient().when(server.getItemFactory()).thenReturn(serverItemFactory);
-    lenient().when(serverItemFactory.getItemMeta(Material.PLAYER_HEAD)).thenReturn(skullMeta);
+    when(server.getLogger()).thenReturn(serverLogger);
+    when(server.getItemFactory()).thenReturn(serverItemFactory);
+    when(serverItemFactory.getItemMeta(Material.PLAYER_HEAD)).thenReturn(skullMeta);
 
     // Right now this works as it is the only test that requires Bukkit internals.
     // If future tests require this we will need a more robust solution.

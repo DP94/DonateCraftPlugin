@@ -13,7 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -64,6 +64,7 @@ public class ReanimationProtocolTest {
     @Test
     public void testThatPlayerWhoIsInSurvivalModeIsNotRevived() {
         when(player.getGameMode()).thenReturn(GameMode.SURVIVAL);
+        when(player.isOnline()).thenReturn(true);
         reanimationProtocol.reanimatePlayer(uuid);
         verify(player, never()).setGameMode(GameMode.SURVIVAL);
     }
@@ -71,6 +72,7 @@ public class ReanimationProtocolTest {
     @Test
     public void testThatAlivePlayerIsNotRevived() {
         when(player.isDead()).thenReturn(false);
+        when(player.isOnline()).thenReturn(true);
         reanimationProtocol.reanimatePlayer(uuid);
         verify(player, never()).setGameMode(GameMode.SURVIVAL);
     }

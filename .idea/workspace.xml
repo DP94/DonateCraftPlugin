@@ -18,8 +18,22 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a5b4a3ee-b8d1-4bc2-9cf2-d26c7a52130f" name="Default Changelist" comment="Upgrade Github actions JDK">
-      <change afterPath="$PROJECT_DIR$/dependency-reduced-pom.xml" afterDir="false" />
+    <list default="true" id="a5b4a3ee-b8d1-4bc2-9cf2-d26c7a52130f" name="Default Changelist" comment="Tidy up">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DonateCraft.iml" beforeDir="false" afterPath="$PROJECT_DIR$/DonateCraft.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/vypersw/DonateCraft.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/vypersw/DonateCraft.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/vypersw/VoteManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/vypersw/command/VoteCommands.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/vypersw/vote/Vote.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/vypersw/vote/VoteAnswer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/vypersw/vote/VoteRecord.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/vypersw/MessageHelperTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/vypersw/MessageHelperTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/vypersw/ReanimationProtocolTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/vypersw/ReanimationProtocolTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/vypersw/VoteManagerTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/vypersw/command/DonateCraftCommandsTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/vypersw/command/DonateCraftCommandsTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/vypersw/command/VoteCommandsTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/vypersw/listeners/PlayerListenerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/vypersw/listeners/PlayerListenerTest.java" afterDir="false" />
     </list>
     <list id="865138be-2a83-4c4f-87bf-7b1e40668c15" name="Passwords" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -41,7 +55,7 @@
         <entry key="$PROJECT_DIR$/.." value="main" />
       </map>
     </option>
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GitSEFilterConfiguration">
@@ -79,7 +93,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../DonateCraftNode" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -95,7 +109,7 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Maven.DonateCraft [clean,install]">
+  <component name="RunManager" selected="JUnit.All in DonateCraft (1)">
     <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
@@ -109,6 +123,14 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="All in DonateCraft (1)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="DonateCraft" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="All in DonateCraft" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="DonateCraft" />
       <option name="PACKAGE_NAME" value="" />
@@ -117,22 +139,23 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="PlayerListenerTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="DonateCraftCommandsTest.testOnCommandOnAlivePlayer" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="DonateCraft" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.vypersw.listeners.*" />
+          <option name="PATTERN" value="com.vypersw.command.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="com.vypersw.listeners" />
-      <option name="MAIN_CLASS_NAME" value="com.vypersw.listeners.PlayerListenerTest" />
-      <option name="TEST_OBJECT" value="class" />
+      <option name="PACKAGE_NAME" value="com.vypersw.command" />
+      <option name="MAIN_CLASS_NAME" value="com.vypersw.command.DonateCraftCommandsTest" />
+      <option name="METHOD_NAME" value="testOnCommandOnAlivePlayer" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ReanimationProtocolTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="ReanimationProtocolTest.testThatPlayerWhoIsInSurvivalModeIsNotRevived" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="DonateCraft" />
       <extension name="coverage">
         <pattern>
@@ -142,7 +165,8 @@
       </extension>
       <option name="PACKAGE_NAME" value="com.vypersw" />
       <option name="MAIN_CLASS_NAME" value="com.vypersw.ReanimationProtocolTest" />
-      <option name="TEST_OBJECT" value="class" />
+      <option name="METHOD_NAME" value="testThatPlayerWhoIsInSurvivalModeIsNotRevived" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -158,22 +182,6 @@
       <option name="PACKAGE_NAME" value="com.vypersw" />
       <option name="MAIN_CLASS_NAME" value="com.vypersw.VoteManagerTest" />
       <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="VoteManagerTest.testIsVoteActiveReturnsTrueWhenVoteIsNotNull" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="DonateCraft" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.vypersw.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="com.vypersw" />
-      <option name="MAIN_CLASS_NAME" value="com.vypersw.VoteManagerTest" />
-      <option name="METHOD_NAME" value="testIsVoteActiveReturnsTrueWhenVoteIsNotNull" />
-      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -219,21 +227,21 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="JUnit.All in DonateCraft" />
-      <item itemvalue="JUnit.PlayerListenerTest" />
-      <item itemvalue="JUnit.ReanimationProtocolTest" />
-      <item itemvalue="JUnit.VoteManagerTest.testIsVoteActiveReturnsTrueWhenVoteIsNotNull" />
       <item itemvalue="JUnit.VoteManagerTest" />
       <item itemvalue="Maven.DonateCraft [clean,install]" />
       <item itemvalue="Remote JVM Debug.Debug plugin" />
+      <item itemvalue="JUnit.DonateCraftCommandsTest.testOnCommandOnAlivePlayer" />
+      <item itemvalue="JUnit.ReanimationProtocolTest.testThatPlayerWhoIsInSurvivalModeIsNotRevived" />
+      <item itemvalue="JUnit.All in DonateCraft" />
+      <item itemvalue="JUnit.All in DonateCraft (1)" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.VoteManagerTest" />
-        <item itemvalue="JUnit.VoteManagerTest.testIsVoteActiveReturnsTrueWhenVoteIsNotNull" />
-        <item itemvalue="JUnit.ReanimationProtocolTest" />
-        <item itemvalue="JUnit.PlayerListenerTest" />
+        <item itemvalue="JUnit.All in DonateCraft (1)" />
+        <item itemvalue="JUnit.ReanimationProtocolTest.testThatPlayerWhoIsInSurvivalModeIsNotRevived" />
         <item itemvalue="JUnit.All in DonateCraft" />
+        <item itemvalue="JUnit.DonateCraftCommandsTest.testOnCommandOnAlivePlayer" />
+        <item itemvalue="JUnit.VoteManagerTest" />
       </list>
     </recent_temporary>
   </component>
@@ -443,7 +451,14 @@
       <option name="project" value="LOCAL" />
       <updated>1649706700393</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="Tidy up">
+      <created>1666090611758</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1666090611758</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -487,7 +502,24 @@
     <MESSAGE value="Update to Java 18, upgrade to JUnit 5, upgrade Mockito to v4" />
     <MESSAGE value="Revert JUnit 5 change" />
     <MESSAGE value="Upgrade Github actions JDK" />
-    <option name="LAST_COMMIT_MESSAGE" value="Upgrade Github actions JDK" />
+    <MESSAGE value="Tidy up" />
+    <option name="LAST_COMMIT_MESSAGE" value="Tidy up" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/com/vypersw/command/DonateCraftCommandsTest.java</url>
+          <line>32</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/com/vypersw/ReanimationProtocolTest.java</url>
+          <line>65</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/DonateCraft$ReanimationProtocolTest.ic" NAME="ReanimationProtocolTest Coverage Results" MODIFIED="1614729425859" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">

@@ -3,13 +3,12 @@ package com.vypersw.network;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.json.JSONObject;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.function.Function;
 
 public class HttpHelper {
 
@@ -54,5 +53,11 @@ public class HttpHelper {
                 .header("Content-Type", "application/json")
                 .GET()
                 .build();
+    }
+
+    public void fireAsyncGetRequestToServer(String endPoint, Function<HttpResponse<String>, Void> f) {
+        HttpRequest request = this.buildGETHttpRequest(endPoint);
+        HttpClient client = HttpClient.newBuilder().build();
+        client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(f);
     }
 }

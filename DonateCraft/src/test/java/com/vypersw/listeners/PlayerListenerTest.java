@@ -100,7 +100,6 @@ public class PlayerListenerTest {
     playerListener.onPlayerDeath(new PlayerDeathEvent(player, Collections.emptyList(), 0, DEATH_MESSAGE));
 
     verify(httpHelper).fireAsyncPostRequestToServer(eq("Death"), deathArgumentCaptor.capture(), runnableArgumentCaptor.capture());
-    verifyNoMoreInteractions(httpHelper);
     Runnable runnable = runnableArgumentCaptor.getValue();
     runnable.run();
 

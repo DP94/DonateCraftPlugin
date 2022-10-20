@@ -1,6 +1,9 @@
 package com.vypersw.listeners;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vypersw.MessageHelper;
+import com.vypersw.RevivalResponse;
 import com.vypersw.network.HttpHelper;
 import com.vypersw.response.DCPlayer;
 import com.vypersw.response.Death;
@@ -14,21 +17,25 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.lang.reflect.Type;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class PlayerListener implements Listener {
 
     private final MessageHelper messageHelper;
     private final HttpHelper httpHelper;
 
-    private List<String> playerCache;
+    private Set<String> playerCache;
 
     public PlayerListener(MessageHelper messageHelper, HttpHelper httpHelper) {
         this.messageHelper = messageHelper;
         this.httpHelper = httpHelper;
-        this.playerCache = new ArrayList<>();
+        this.playerCache = new HashSet<>();
+        this.loadPlayerCache();
     }
 
     @EventHandler
@@ -65,5 +72,26 @@ public class PlayerListener implements Listener {
         skullMeta.setLore(Collections.singletonList(reason));
         skull.setItemMeta(skullMeta);
         player.getWorld().dropItem(player.getLocation(), skull);
+    }
+
+    private void loadPlayerCache() {
+        this.httpHelper.fireAsyncGetRequestToServer("Player", asyncResponse -> {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                List<DCPlayer> response = objectMapper.readValue(asyncResponse.body(), new TypeReference<>() {
+                    @Override
+                    public Type getType() {
+                        return super.getType();
+                    }
+                });
+                if (response != null) {
+                    this.playerCache.addAll(response.stream().map(p -> p.getId().toString()).collect(Collectors.toList()));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            //Return null here to satisfy <Void> Function type
+            return null;
+        });
     }
 }

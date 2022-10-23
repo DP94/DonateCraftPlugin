@@ -99,7 +99,7 @@ public class PlayerListenerTest {
   public void testOnPlayerDeath() {
     playerListener.onPlayerDeath(new PlayerDeathEvent(player, Collections.emptyList(), 0, DEATH_MESSAGE));
 
-    verify(httpHelper).fireAsyncPostRequestToServer(eq("Death"), deathArgumentCaptor.capture(), runnableArgumentCaptor.capture());
+    verify(httpHelper).fireAsyncPostRequestToServer(eq("Player/" + PLAYER_UUID.toString() + "/Death"), deathArgumentCaptor.capture(), runnableArgumentCaptor.capture());
     Runnable runnable = runnableArgumentCaptor.getValue();
     runnable.run();
 
@@ -111,7 +111,7 @@ public class PlayerListenerTest {
     verify(messageHelper).sendDeathURL(player);
     verifyNoMoreInteractions(messageHelper);
 
-    verify(player).getUniqueId();
+    verify(player, times(2)).getUniqueId();
     verify(player).getName();
     verify(player).getWorld();
     verify(player).getLocation();

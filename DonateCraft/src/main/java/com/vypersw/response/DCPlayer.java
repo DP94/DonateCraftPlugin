@@ -1,10 +1,12 @@
 package com.vypersw.response;
 
+import java.util.List;
 import java.util.UUID;
 
 public class DCPlayer {
     private UUID id;
     private String name;
+    private List<Death> deaths;
 
     public DCPlayer() {}
 
@@ -27,5 +29,13 @@ public class DCPlayer {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Death> getDeaths() {
+        return deaths;
+    }
+
+    public void setDeaths(List<Death> deaths) {
+        this.deaths = deaths;
     }
 }

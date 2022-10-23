@@ -45,7 +45,7 @@ public class PlayerListener implements Listener {
         death.setPlayerId(player.getUniqueId());
         death.setPlayerName(player.getName());
         death.setReason(event.getDeathMessage());
-        httpHelper.fireAsyncPostRequestToServer("Death", death, () -> messageHelper.sendDeathURL(player));
+        httpHelper.fireAsyncPostRequestToServer("Player/" + player.getUniqueId().toString() + "/Death", death, () -> messageHelper.sendDeathURL(player));
 
         dropSkull(player, event.getDeathMessage());
     }

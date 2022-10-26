@@ -1,30 +1,22 @@
 package com.vypersw.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
 import java.util.Objects;
 
-@JsonRootName(value = "revival")
+@JsonIgnoreProperties(value = "donationId")
 public class Revival {
-    private long id;
-    private String key;
+    private String id;
     private boolean unlocked;
     private Donation donation;
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
     }
 
     public boolean isUnlocked() {
@@ -48,6 +40,6 @@ public class Revival {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Revival revival = (Revival) o;
-        return Objects.equals(key, revival.key);
+        return id == revival.id;
     }
 }

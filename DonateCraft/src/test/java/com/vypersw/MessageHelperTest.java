@@ -49,7 +49,7 @@ public class MessageHelperTest {
         when(player.getUniqueId()).thenReturn(PLAYER_UUID);
         messageHelper = new MessageHelper(SERVER_URL);
         revival = new Revival();
-        revival.setId(1L);
+        revival.setId(UUID.randomUUID().toString());
         donation = new Donation();
         donation.setId(1L);
         donation.setCharityName("Test charity");

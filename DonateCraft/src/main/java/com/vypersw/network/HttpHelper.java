@@ -46,6 +46,16 @@ public class HttpHelper {
         fireAsyncPostRequestToServer(endPoint, objectToMap, null);
     }
 
+    public void fireAsyncDeleteRequestToServer(String endPoint) {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serverURL + endPoint))
+                .DELETE()
+                .build();
+        System.out.println(serverURL + endPoint);
+        HttpClient client = HttpClient.newBuilder().build();
+        client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+    }
+
 
     public HttpRequest buildGETHttpRequest(String endPoint) {
         return HttpRequest.newBuilder()

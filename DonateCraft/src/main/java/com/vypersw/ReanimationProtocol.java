@@ -1,20 +1,23 @@
 package com.vypersw;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vypersw.network.HttpHelper;
+import com.vypersw.response.DCPlayer;
 import com.vypersw.response.Revival;
 import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.lang.reflect.Type;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -37,19 +40,26 @@ public class ReanimationProtocol implements Runnable {
     }
 
     private void reanimateEligiblePlayers() {
-        HttpRequest request = httpHelper.buildGETHttpRequest("/unlocked");
+        HttpRequest request = httpHelper.buildGETHttpRequest("Lock?" + this.getQueryStringForPlayerIds());
         HttpClient client = HttpClient.newBuilder().build();
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenAccept(asyncResponse -> {
             ObjectMapper objectMapper = new ObjectMapper();
             try {
-                RevivalResponse response = objectMapper.readerFor(RevivalResponse.class).readValue(asyncResponse.body());
-                if (response.getRevivals() != null && !response.getRevivals().isEmpty()) {
-                    for (Revival revival : response.getRevivals()) {
-                        UUID uuid = UUID.fromString(revival.getKey());
-                        Player player = server.getPlayer(uuid);
-                        if (player != null && player.getGameMode() == GameMode.SPECTATOR) {
-                            server.broadcastMessage(messageHelper.getDonationMessageFromRevival(player, revival));
-                            toRevive.offer(uuid);
+                List<Revival> response = objectMapper.readValue(asyncResponse.body(), new TypeReference<>() {
+                    @Override
+                    public Type getType() {
+                        return super.getType();
+                    }
+                });
+                if (response != null && !response.isEmpty()) {
+                    for (Revival revival : response) {
+                        if (revival.isUnlocked() == true) {
+                            UUID uuid = UUID.fromString(revival.getId());
+                            Player player = server.getPlayer(uuid);
+                            if (player != null && player.getGameMode() == GameMode.SPECTATOR) {
+                                server.broadcastMessage(messageHelper.getDonationMessageFromRevival(player, revival));
+                                toRevive.offer(uuid);
+                            }
                         }
                     }
                 }
@@ -65,10 +75,18 @@ public class ReanimationProtocol implements Runnable {
         }
     }
 
+    private String getQueryStringForPlayerIds() {
+        StringBuilder builder = new StringBuilder();
+        for (Player player : server.getOnlinePlayers()) {
+            builder.append("playerIds=" + player.getUniqueId() + "&");
+        }
+        return builder.toString();
+    }
+
     public void reanimatePlayer(UUID uuid) {
         Player player = server.getPlayer(uuid);
         Revival revival = new Revival();
-        revival.setKey(uuid.toString());
+        revival.setId(uuid.toString());
         //Extra checks just in case Minecraft has pinged the server again before our async call has come back
         if (player != null && player.isOnline() && (player.isDead() || player.getGameMode() == GameMode.SPECTATOR)) {
             server.getLogger().info("Attempting to revive " + player.getName());
@@ -84,9 +102,9 @@ public class ReanimationProtocol implements Runnable {
             currentPlayerWorld.spawnEntity(player.getLocation(), EntityType.FIREWORK);
             addRespawnPotionEffects(player);
             server.broadcastMessage(ChatColor.GOLD + player.getName() + " " + ChatColor.GREEN + "has been revived!");
-            httpHelper.fireAsyncPostRequestToServer("/revived", revival);
+            httpHelper.fireAsyncDeleteRequestToServer("Lock/" + uuid);
         } else if (player != null && player.isOnline() && !player.isDead()) {
-            httpHelper.fireAsyncPostRequestToServer("/revived", revival);
+            httpHelper.fireAsyncDeleteRequestToServer("Lock/" + uuid);
         }
     }
 

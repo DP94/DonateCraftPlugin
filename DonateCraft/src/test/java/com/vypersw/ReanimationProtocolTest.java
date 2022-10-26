@@ -80,14 +80,14 @@ public class ReanimationProtocolTest {
     @Test
     public void testThatOnlineAndDeadPlayerIsRevived() {
         Revival revival = new Revival();
-        revival.setKey(uuid.toString());
+        revival.setId(uuid.toString());
         when(player.isOnline()).thenReturn(true);
         when(player.isDead()).thenReturn(true);
         when(player.getWorld()).thenReturn(world);
         reanimationProtocol.reanimatePlayer(uuid);
         verify(player).setGameMode(GameMode.SURVIVAL);
         verify(world).strikeLightningEffect(player.getLocation());
-        verify(httpHelper).fireAsyncPostRequestToServer("/revived", revival);
+        verify(httpHelper).fireAsyncDeleteRequestToServer("Lock/" + uuid.toString());
     }
 
     @Test
@@ -113,11 +113,11 @@ public class ReanimationProtocolTest {
     @Test
     public void testThatPlayerWhoIsntDeadButIsEligibleForRevivalSendsRequestToServerToDeleteLock() {
         Revival revival = new Revival();
-        revival.setKey(uuid.toString());
+        revival.setId(uuid.toString());
         when(player.isOnline()).thenReturn(true);
         when(player.isDead()).thenReturn(false);
         reanimationProtocol.reanimatePlayer(uuid);
-        verify(httpHelper).fireAsyncPostRequestToServer("/revived", revival);
+        verify(httpHelper).fireAsyncDeleteRequestToServer("Lock/" + uuid.toString());
     }
 
     @Test

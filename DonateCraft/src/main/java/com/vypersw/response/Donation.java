@@ -6,8 +6,8 @@ public class Donation {
 
     private Long id;
     private Double amount;
-    private Date date;
-    private long charity;
+    private Date createdDate;
+    private long charityId;
     private String charityName;
     private DCPlayer player;
     private DCPlayer paidForBy;
@@ -32,20 +32,20 @@ public class Donation {
         this.amount = amount;
     }
 
-    public Date getDate() {
-        return date;
+    public Date getCreatedDate() {
+        return createdDate;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
     }
 
-    public long getCharity() {
-        return charity;
+    public long getCharityId() {
+        return charityId;
     }
 
-    public void setCharity(long charity) {
-        this.charity = charity;
+    public void setCharityId(long charityId) {
+        this.charityId = charityId;
     }
 
     public String getCharityName() {

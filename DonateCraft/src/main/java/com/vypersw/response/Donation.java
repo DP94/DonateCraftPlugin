@@ -1,7 +1,10 @@
 package com.vypersw.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.Date;
 
+@JsonIgnoreProperties("paidForId")
 public class Donation {
 
     private Long id;
@@ -9,7 +12,6 @@ public class Donation {
     private Date createdDate;
     private long charityId;
     private String charityName;
-    private DCPlayer player;
     private DCPlayer paidForBy;
 
     public long getId() {
@@ -54,14 +56,6 @@ public class Donation {
 
     public void setCharityName(String charityName) {
         this.charityName = charityName;
-    }
-
-    public DCPlayer getPlayer() {
-        return player;
-    }
-
-    public void setPlayer(DCPlayer player) {
-        this.player = player;
     }
 
     public DCPlayer getPaidForBy() {

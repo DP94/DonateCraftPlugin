@@ -7,6 +7,8 @@ public class DCPlayer {
     private UUID id;
     private String name;
     private List<Death> deaths;
+    private List<Donation> donations;
+    private UUID playerId;
 
     public DCPlayer() {}
 
@@ -37,5 +39,21 @@ public class DCPlayer {
 
     public void setDeaths(List<Death> deaths) {
         this.deaths = deaths;
+    }
+
+    public UUID getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(UUID playerId) {
+        this.playerId = playerId;
+    }
+
+    public List<Donation> getDonations() {
+        return donations;
+    }
+
+    public void setDonations(List<Donation> donations) {
+        this.donations = donations;
     }
 }

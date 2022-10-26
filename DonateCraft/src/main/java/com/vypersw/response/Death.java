@@ -1,22 +1,19 @@
 package com.vypersw.response;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
-
 import java.util.Objects;
 import java.util.UUID;
 
-@JsonRootName(value = "death")
 public class Death {
-    private UUID playerId;
+    private UUID id;
     private String playerName;
     private String reason;
 
-    public UUID getPlayerId() {
-        return playerId;
+    public UUID getId() {
+        return id;
     }
 
-    public void setPlayerId(UUID playerId) {
-        this.playerId = playerId;
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public String getPlayerName() {
@@ -40,6 +37,6 @@ public class Death {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Death death = (Death) o;
-        return Objects.equals(playerId, death.playerId) && Objects.equals(playerName, death.playerName) && Objects.equals(reason, death.reason);
+        return Objects.equals(id, death.id) && Objects.equals(playerName, death.playerName) && Objects.equals(reason, death.reason);
     }
 }

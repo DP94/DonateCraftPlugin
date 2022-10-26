@@ -106,7 +106,7 @@ public class PlayerListenerTest {
     Death death = deathArgumentCaptor.getValue();
     assertThat(death.getReason(), equalTo(DEATH_MESSAGE));
     assertThat(death.getPlayerName(), equalTo(PLAYER_NAME));
-    assertThat(death.getPlayerId(), equalTo(PLAYER_UUID));
+    assertThat(death.getId(), equalTo(PLAYER_UUID));
 
     verify(messageHelper).sendDeathURL(player);
     verifyNoMoreInteractions(messageHelper);

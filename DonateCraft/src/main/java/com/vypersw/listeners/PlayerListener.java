@@ -3,7 +3,6 @@ package com.vypersw.listeners;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vypersw.MessageHelper;
-import com.vypersw.RevivalResponse;
 import com.vypersw.network.HttpHelper;
 import com.vypersw.response.DCPlayer;
 import com.vypersw.response.Death;
@@ -18,9 +17,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Type;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,7 +38,7 @@ public class PlayerListener implements Listener {
     void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
         Death death = new Death();
-        death.setPlayerId(player.getUniqueId());
+        death.setId(player.getUniqueId());
         death.setPlayerName(player.getName());
         death.setReason(event.getDeathMessage());
         httpHelper.fireAsyncPostRequestToServer("Player/" + player.getUniqueId().toString() + "/Death", death, () -> messageHelper.sendDeathURL(player));

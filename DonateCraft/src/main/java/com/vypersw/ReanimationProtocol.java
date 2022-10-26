@@ -36,7 +36,9 @@ public class ReanimationProtocol implements Runnable {
 
     @Override
     public void run() {
-        reanimateEligiblePlayers();
+        if (server.getOnlinePlayers().size() > 0) {
+            reanimateEligiblePlayers();
+        }
     }
 
     private void reanimateEligiblePlayers() {

@@ -36,7 +36,7 @@ public class MessageHelper {
 
         builder.append(ChatColor.GOLD);
 
-        if (revival.getDonation().getPaidForBy() != null) {
+        if (revival.getDonation().getPaidForBy() != null && !revival.getDonation().getPaidForBy().getId().equals(player.getUniqueId())) {
              builder.append(revival.getDonation().getPaidForBy().getName())
                     .append(ChatColor.WHITE)
                     .append(" just donated")

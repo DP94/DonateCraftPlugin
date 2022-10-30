@@ -1,8 +1,11 @@
 package com.vypersw.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.Objects;
 import java.util.UUID;
 
+@JsonIgnoreProperties({"playerId", "createdDate"})
 public class Death {
     private UUID id;
     private String playerName;

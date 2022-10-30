@@ -128,7 +128,7 @@ public class MessageHelperTest {
       assertThat(componentList.get(1).isBold(), equalTo(true));
       assertThat(componentList.get(1).isUnderlined(), equalTo(true));
       assertThat(componentList.get(1).getClickEvent().getAction(), equalTo(ClickEvent.Action.OPEN_URL));
-      assertThat(componentList.get(1).getClickEvent().getValue(), equalTo(SERVER_URL + "#donate;key=" + PLAYER_UUID));
+      assertThat(componentList.get(1).getClickEvent().getValue(), equalTo(SERVER_URL + "charities?playerId=" + PLAYER_UUID));
       assertThat(componentList.get(2).getText(), equalTo(" to donate to a charity to buy back in!"));
     }
 }

@@ -13,13 +13,18 @@ public class Donation {
     private long charityId;
     private String charityName;
     private DCPlayer paidForBy;
+    private boolean isPrivate;
 
     public long getId() {
         return id;
     }
 
     public boolean isPrivate() {
-        return amount == null && id != null;
+        return isPrivate;
+    }
+
+    public void setPrivate(boolean aPrivate) {
+        isPrivate = aPrivate;
     }
 
     public void setId(Long id) {

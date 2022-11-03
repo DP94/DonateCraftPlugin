@@ -18,7 +18,7 @@ public class MessageHelper {
     }
 
     public void sendDeathURL(Player player) {
-        String deathURL = serverURL + "#donate;key=" + player.getUniqueId().toString();
+        String deathURL = serverURL + "charities?playerId=" + player.getUniqueId();
         TextComponent textComponent = new TextComponent("You died! Please click ");
         textComponent.setColor(net.md_5.bungee.api.ChatColor.RED);
         TextComponent thisTextComp = new TextComponent("this link");

@@ -38,12 +38,12 @@ public class ReanimationProtocol implements Runnable {
     @Override
     public void run() {
 
-        //In hardcore worlds, Entity::isDead() returns false as the player is moved to Spectator mode
-        if (server.getOnlinePlayers().stream().noneMatch(p -> p.getGameMode() == GameMode.SPECTATOR)) {
+        if (server.getOnlinePlayers().size() == 0) {
             return;
         }
 
-        if (server.getOnlinePlayers().size() == 0) {
+        //In hardcore worlds, Entity::isDead() returns false as the player is moved to Spectator mode
+        if (server.getOnlinePlayers().stream().noneMatch(p -> p.getGameMode() == GameMode.SPECTATOR)) {
             return;
         }
 

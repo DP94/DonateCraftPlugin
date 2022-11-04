@@ -6,6 +6,7 @@ import com.vypersw.network.HttpHelper;
 import com.vypersw.response.DCPlayer;
 import com.vypersw.response.Revival;
 import org.bukkit.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -36,9 +37,17 @@ public class ReanimationProtocol implements Runnable {
 
     @Override
     public void run() {
-        if (server.getOnlinePlayers().size() > 0) {
-            reanimateEligiblePlayers();
+
+        //In hardcore worlds, Entity::isDead() returns false as the player is moved to Spectator mode
+        if (server.getOnlinePlayers().stream().noneMatch(p -> p.getGameMode() == GameMode.SPECTATOR)) {
+            return;
         }
+
+        if (server.getOnlinePlayers().size() == 0) {
+            return;
+        }
+
+        reanimateEligiblePlayers();
     }
 
     private void reanimateEligiblePlayers() {

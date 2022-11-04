@@ -58,7 +58,7 @@ public class MessageHelperTest {
 
     @Test
     public void testThatDonationBroadcastDoesNotIncludeDonationAmountIfIsPrivate() {
-        donation.setAmount(null);
+        donation.setPrivate(true);
         String result = messageHelper.getDonationMessageFromRevival(player, revival);
         //§ is inserted by ChatColor.COLOR, i.e. ChatColor.WHITE is §f
         String expected = "§6Test§f just donated§f to §6Test charity§f! They will be revived shortly (if they are online)";

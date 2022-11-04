@@ -1,8 +1,11 @@
 package com.vypersw.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.List;
 import java.util.UUID;
 
+@JsonIgnoreProperties("isDead")
 public class DCPlayer {
     private UUID id;
     private String name;

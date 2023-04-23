@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.Date;
 
-@JsonIgnoreProperties("paidForId")
+@JsonIgnoreProperties({"paidForId", "playerId"})
 public class Donation {
 
     private Long id;

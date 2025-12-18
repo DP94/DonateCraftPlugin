@@ -57,8 +57,8 @@ public class ReanimationProtocolTest {
         when(server.getPlayer(uuid)).thenReturn(player);
         glowing = new PotionEffect(PotionEffectType.GLOWING, 200, 100, true, true);
         regen = new PotionEffect(PotionEffectType.REGENERATION, 200, 10, true, true);
-        heal = new PotionEffect(PotionEffectType.HEAL, 200, 10, true, true);
-        damageResistance = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 200, 10, true, true);
+        heal = new PotionEffect(PotionEffectType.HEALTH_BOOST, 200, 10, true, true);
+        damageResistance = new PotionEffect(PotionEffectType.RESISTANCE, 200, 10, true, true);
     }
 
     @Test

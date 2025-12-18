@@ -9,6 +9,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.World;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -97,7 +99,7 @@ public class PlayerListenerTest {
 
   @Test
   public void testOnPlayerDeath() {
-    playerListener.onPlayerDeath(new PlayerDeathEvent(player, Collections.emptyList(), 0, DEATH_MESSAGE));
+    playerListener.onPlayerDeath(new PlayerDeathEvent(player, DamageSource.builder(DamageType.ARROW).build(), Collections.emptyList(), 0, DEATH_MESSAGE));
 
     verify(httpHelper).fireAsyncPostRequestToServer(eq("Player/" + PLAYER_UUID.toString() + "/Death"), deathArgumentCaptor.capture(), runnableArgumentCaptor.capture());
     Runnable runnable = runnableArgumentCaptor.getValue();

@@ -110,7 +110,7 @@ public class ReanimationProtocol implements Runnable {
             player.setGameMode(GameMode.SURVIVAL);
             currentPlayerWorld.strikeLightningEffect(player.getLocation());
             currentPlayerWorld.playEffect(player.getLocation(), Effect.DRAGON_BREATH, 0);
-            currentPlayerWorld.spawnEntity(player.getLocation(), EntityType.FIREWORK);
+            currentPlayerWorld.spawnEntity(player.getLocation(), EntityType.FIREWORK_ROCKET);
             addRespawnPotionEffects(player);
             server.broadcastMessage(ChatColor.GOLD + player.getName() + " " + ChatColor.GREEN + "has been revived!");
             httpHelper.fireAsyncDeleteRequestToServer("Lock/" + uuid);
@@ -122,7 +122,7 @@ public class ReanimationProtocol implements Runnable {
     public void addRespawnPotionEffects(Player player) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 200, 100, true, true));
         player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 200, 10, true, true));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.HEAL, 200, 10, true, true));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 200, 10, true, true));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.HEALTH_BOOST, 200, 10, true, true));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 200, 10, true, true));
     }
 }

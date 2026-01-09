@@ -3,16 +3,13 @@ package com.vypersw;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vypersw.network.HttpHelper;
-import com.vypersw.response.DCPlayer;
+import com.vypersw.response.LockStatus;
 import com.vypersw.response.Revival;
 import org.bukkit.*;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.net.http.HttpClient;
@@ -64,7 +61,7 @@ public class ReanimationProtocol implements Runnable {
                 });
                 if (response != null && !response.isEmpty()) {
                     for (Revival revival : response) {
-                        if (revival.isUnlocked() == true) {
+                        if (revival.getStatus() == LockStatus.UNLOCKED) {
                             UUID uuid = UUID.fromString(revival.getId());
                             Player player = server.getPlayer(uuid);
                             if (player != null && player.getGameMode() == GameMode.SPECTATOR) {

@@ -1,7 +1,6 @@
 package com.vypersw.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonRootName;
 
 import java.util.Objects;
 
@@ -10,6 +9,8 @@ public class Revival {
     private String id;
     private boolean unlocked;
     private Donation donation;
+
+    private LockStatus status;
 
     public String getId() {
         return id;
@@ -35,11 +36,18 @@ public class Revival {
         this.donation = donation;
     }
 
+    public LockStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(LockStatus status) {
+        this.status = status;
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Revival revival = (Revival) o;
-        return id == revival.id;
+        return unlocked == revival.unlocked && Objects.equals(id, revival.id) && Objects.equals(donation, revival.donation) && status == revival.status;
     }
 }

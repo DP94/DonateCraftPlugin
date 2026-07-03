@@ -6,13 +6,13 @@ import com.vypersw.response.Revival;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,10 +20,10 @@ import java.util.UUID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MessageHelperTest {
 
     private static final String SERVER_URL = "server.url";
@@ -42,11 +42,11 @@ public class MessageHelperTest {
     private Donation donation;
     private MessageHelper messageHelper;
 
-    @Before
+    @BeforeEach
     public void before() {
-        when(player.getName()).thenReturn("Test");
-        when(player.spigot()).thenReturn(spigotPlayer);
-        when(player.getUniqueId()).thenReturn(PLAYER_UUID);
+        lenient().when(player.getName()).thenReturn("Test");
+        lenient().when(player.spigot()).thenReturn(spigotPlayer);
+        lenient().when(player.getUniqueId()).thenReturn(PLAYER_UUID);
         messageHelper = new MessageHelper(SERVER_URL);
         revival = new Revival();
         revival.setId(UUID.randomUUID().toString());
@@ -60,7 +60,6 @@ public class MessageHelperTest {
     public void testThatDonationBroadcastDoesNotIncludeDonationAmountIfIsPrivate() {
         donation.setPrivate(true);
         String result = messageHelper.getDonationMessageFromRevival(player, revival);
-        //§ is inserted by ChatColor.COLOR, i.e. ChatColor.WHITE is §f
         String expected = "§6Test§f just donated§f to §6Test charity§f! They will be revived shortly (if they are online)";
         assertEquals(expected, result);
     }
@@ -69,7 +68,6 @@ public class MessageHelperTest {
     public void testThatDonationBroadcastDoesIncludeDonationAmountIfIsNotPrivate() {
         donation.setAmount(10.50);
         String result = messageHelper.getDonationMessageFromRevival(player, revival);
-        //§ is inserted by ChatColor.COLOR, i.e. ChatColor.WHITE is §f
         String expected = "§6Test§f just donated§a £10.50§f to §6Test charity§f! They will be revived shortly (if they are online)";
         assertEquals(expected, result);
     }
@@ -78,7 +76,6 @@ public class MessageHelperTest {
     public void testThatDonationFormatsCorrectlyIfWholeNumber(){
         donation.setAmount(10.00);
         String result = messageHelper.getDonationMessageFromRevival(player, revival);
-        //§ is inserted by ChatColor.COLOR, i.e. ChatColor.WHITE is §f
         String expected = "§6Test§f just donated§a £10.00§f to §6Test charity§f! They will be revived shortly (if they are online)";
         assertEquals(expected, result);
     }
@@ -87,7 +84,6 @@ public class MessageHelperTest {
     public void testThatDonationFormatsCorrectlyWithLeadingZero() {
         donation.setAmount(02.00);
         String result = messageHelper.getDonationMessageFromRevival(player, revival);
-        //§ is inserted by ChatColor.COLOR, i.e. ChatColor.WHITE is §f
         String expected = "§6Test§f just donated§a £2.00§f to §6Test charity§f! They will be revived shortly (if they are online)";
         assertEquals(expected, result);
     }
@@ -96,7 +92,6 @@ public class MessageHelperTest {
     public void testThatDonationWithLargeDecimalNumberFormatsCorrectly() {
         donation.setAmount(100.99);
         String result = messageHelper.getDonationMessageFromRevival(player, revival);
-        //§ is inserted by ChatColor.COLOR, i.e. ChatColor.WHITE is §f
         String expected = "§6Test§f just donated§a £100.99§f to §6Test charity§f! They will be revived shortly (if they are online)";
         assertEquals(expected, result);
     }

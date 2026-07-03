@@ -99,15 +99,15 @@ public class ReanimationProtocol implements Runnable {
         if (player != null && player.isOnline() && (player.isDead() || player.getGameMode() == GameMode.SPECTATOR)) {
             server.getLogger().info("Attempting to revive " + player.getName());
             World currentPlayerWorld = player.getWorld();
-            if (player.getBedSpawnLocation() == null) {
+            if (player.getRespawnLocation() == null) {
                 player.teleport(currentPlayerWorld.getSpawnLocation());
             } else {
-                player.teleport(player.getBedSpawnLocation());
+                player.teleport(player.getRespawnLocation());
             }
             player.setGameMode(GameMode.SURVIVAL);
             currentPlayerWorld.strikeLightningEffect(player.getLocation());
             currentPlayerWorld.playEffect(player.getLocation(), Effect.DRAGON_BREATH, 0);
-            currentPlayerWorld.spawnEntity(player.getLocation(), EntityType.FIREWORK);
+            currentPlayerWorld.spawnEntity(player.getLocation(), EntityType.FIREWORK_ROCKET);
             addRespawnPotionEffects(player);
             server.broadcastMessage(ChatColor.GOLD + player.getName() + " " + ChatColor.GREEN + "has been revived!");
             httpHelper.fireAsyncDeleteRequestToServer("Lock/" + uuid);
@@ -119,7 +119,7 @@ public class ReanimationProtocol implements Runnable {
     public void addRespawnPotionEffects(Player player) {
         player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 200, 100, true, true));
         player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 200, 10, true, true));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.HEAL, 200, 10, true, true));
-        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 200, 10, true, true));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.INSTANT_HEALTH, 200, 10, true, true));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 200, 10, true, true));
     }
 }

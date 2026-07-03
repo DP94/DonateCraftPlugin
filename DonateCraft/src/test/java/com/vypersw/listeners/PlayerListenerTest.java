@@ -15,13 +15,13 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemFactory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.UUID;
@@ -32,7 +32,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class PlayerListenerTest {
 
   private static final String DEATH_MESSAGE = "pricked to death";
@@ -75,20 +75,18 @@ public class PlayerListenerTest {
 
   private PlayerListener playerListener;
 
-  @Before
+  @BeforeEach
   public void before() {
-    when(player.getUniqueId()).thenReturn(PLAYER_UUID);
-    when(player.getName()).thenReturn(PLAYER_NAME);
-    when(player.getWorld()).thenReturn(world);
-    when(player.getLocation()).thenReturn(PLAYER_LOCATION);
+    lenient().when(player.getUniqueId()).thenReturn(PLAYER_UUID);
+    lenient().when(player.getName()).thenReturn(PLAYER_NAME);
+    lenient().when(player.getWorld()).thenReturn(world);
+    lenient().when(player.getLocation()).thenReturn(PLAYER_LOCATION);
     playerListener = new PlayerListener(messageHelper, httpHelper);
 
-    when(server.getLogger()).thenReturn(serverLogger);
-    when(server.getItemFactory()).thenReturn(serverItemFactory);
-    when(serverItemFactory.getItemMeta(Material.PLAYER_HEAD)).thenReturn(skullMeta);
+    lenient().when(server.getLogger()).thenReturn(serverLogger);
+    lenient().when(server.getItemFactory()).thenReturn(serverItemFactory);
+    lenient().when(serverItemFactory.getItemMeta(Material.PLAYER_HEAD)).thenReturn(skullMeta);
 
-    // Right now this works as it is the only test that requires Bukkit internals.
-    // If future tests require this we will need a more robust solution.
     if (Bukkit.getServer() == null) {
       Bukkit.setServer(server);
     }
@@ -97,7 +95,7 @@ public class PlayerListenerTest {
 
   @Test
   public void testOnPlayerDeath() {
-    playerListener.onPlayerDeath(new PlayerDeathEvent(player, Collections.emptyList(), 0, DEATH_MESSAGE));
+    playerListener.onPlayerDeath(new PlayerDeathEvent(player, null, Collections.emptyList(), 0, DEATH_MESSAGE));
 
     verify(httpHelper).fireAsyncPostRequestToServer(eq("Player/" + PLAYER_UUID.toString() + "/Death"), deathArgumentCaptor.capture(), runnableArgumentCaptor.capture());
     Runnable runnable = runnableArgumentCaptor.getValue();

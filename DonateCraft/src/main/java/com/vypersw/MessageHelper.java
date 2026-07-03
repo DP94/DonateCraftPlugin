@@ -64,7 +64,7 @@ public class MessageHelper {
         StringBuilder builder = new StringBuilder();
         if (!revival.getDonation().isPrivate()) {
             builder.append(ChatColor.GREEN);
-            builder.append(" £");
+            builder.append(" \u00A3");
             builder.append(donationAmountFormat.format(revival.getDonation().getAmount()));
         }
         return builder.toString();

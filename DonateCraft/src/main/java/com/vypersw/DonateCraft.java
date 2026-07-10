@@ -18,9 +18,9 @@ public class DonateCraft extends JavaPlugin {
 
         HttpHelper httpHelper = new HttpHelper(backendServerURL);
         MessageHelper messageHelper = new MessageHelper(frontendServerURL);
-        getServer().getPluginManager().registerEvents(new PlayerListener(messageHelper, httpHelper), this);
-        this.getCommand("dc").setExecutor(new DonateCraftCommands(messageHelper));
         ReanimationProtocol reanimationProtocol = new ReanimationProtocol(getServer(), messageHelper, httpHelper);
+        getServer().getPluginManager().registerEvents(new PlayerListener(messageHelper, httpHelper, reanimationProtocol), this);
+        this.getCommand("dc").setExecutor(new DonateCraftCommands(messageHelper));
         getServer().getScheduler().scheduleSyncRepeatingTask(this, reanimationProtocol, 5 * TICKS_TO_SECONDS, 10 * TICKS_TO_SECONDS);
     }
 }

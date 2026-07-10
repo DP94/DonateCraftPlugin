@@ -5,11 +5,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.Objects;
 import java.util.UUID;
 
-@JsonIgnoreProperties({"playerId", "createdDate"})
+@JsonIgnoreProperties(value = {"playerId", "createdDate"}, ignoreUnknown = true)
 public class Death {
     private UUID id;
     private String playerName;
     private String reason;
+    private boolean autoRevived;
 
     public UUID getId() {
         return id;
@@ -35,11 +36,19 @@ public class Death {
         this.reason = reason;
     }
 
+    public boolean isAutoRevived() {
+        return autoRevived;
+    }
+
+    public void setAutoRevived(boolean autoRevived) {
+        this.autoRevived = autoRevived;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Death death = (Death) o;
-        return Objects.equals(id, death.id) && Objects.equals(playerName, death.playerName) && Objects.equals(reason, death.reason);
+        return autoRevived == death.autoRevived && Objects.equals(id, death.id) && Objects.equals(playerName, death.playerName) && Objects.equals(reason, death.reason);
     }
 }

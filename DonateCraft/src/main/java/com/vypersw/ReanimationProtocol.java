@@ -83,6 +83,10 @@ public class ReanimationProtocol implements Runnable {
         }
     }
 
+    public void queueForRevival(UUID uuid) {
+        toRevive.offer(uuid);
+    }
+
     private String getQueryStringForPlayerIds() {
         StringBuilder builder = new StringBuilder();
         for (Player player : server.getOnlinePlayers()) {

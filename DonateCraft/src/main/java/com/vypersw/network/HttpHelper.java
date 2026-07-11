@@ -42,8 +42,26 @@ public class HttpHelper {
         }
     }
 
+    public void fireAsyncPostRequestToServer(String endPoint, Object objectToMap, Function<HttpResponse<String>, Void> responseHandler) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE);
+            String objectJSON = objectMapper.writeValueAsString(objectToMap);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(serverURL + endPoint))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(objectJSON))
+                    .build();
+            HttpClient client = HttpClient.newBuilder().build();
+            client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(responseHandler);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void fireAsyncPostRequestToServer(String endPoint, Object objectToMap) {
-        fireAsyncPostRequestToServer(endPoint, objectToMap, null);
+        fireAsyncPostRequestToServer(endPoint, objectToMap, (Runnable) null);
     }
 
     public void fireAsyncDeleteRequestToServer(String endPoint) {

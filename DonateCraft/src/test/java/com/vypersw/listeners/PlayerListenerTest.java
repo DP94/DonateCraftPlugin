@@ -1,6 +1,7 @@
 package com.vypersw.listeners;
 
 import com.vypersw.MessageHelper;
+import com.vypersw.ReanimationProtocol;
 import com.vypersw.network.HttpHelper;
 import com.vypersw.response.Death;
 import org.bukkit.Bukkit;
@@ -23,8 +24,10 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.net.http.HttpResponse;
 import java.util.Collections;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -50,6 +53,9 @@ public class PlayerListenerTest {
   private MessageHelper messageHelper;
 
   @Mock
+  private ReanimationProtocol reanimationProtocol;
+
+  @Mock
   private Server server;
 
   @Mock
@@ -64,11 +70,14 @@ public class PlayerListenerTest {
   @Mock
   private World world;
 
+  @Mock
+  private HttpResponse<String> httpResponse;
+
   @Captor
   ArgumentCaptor<Death> deathArgumentCaptor;
 
   @Captor
-  ArgumentCaptor<Runnable> runnableArgumentCaptor;
+  ArgumentCaptor<Function<HttpResponse<String>, Void>> responseFunctionCaptor;
 
   @Captor
   ArgumentCaptor<ItemStack> itemStackArgumentCaptor;
@@ -81,7 +90,7 @@ public class PlayerListenerTest {
     lenient().when(player.getName()).thenReturn(PLAYER_NAME);
     lenient().when(player.getWorld()).thenReturn(world);
     lenient().when(player.getLocation()).thenReturn(PLAYER_LOCATION);
-    playerListener = new PlayerListener(messageHelper, httpHelper);
+    playerListener = new PlayerListener(messageHelper, httpHelper, reanimationProtocol);
 
     lenient().when(server.getLogger()).thenReturn(serverLogger);
     lenient().when(server.getItemFactory()).thenReturn(serverItemFactory);
@@ -97,9 +106,9 @@ public class PlayerListenerTest {
   public void testOnPlayerDeath() {
     playerListener.onPlayerDeath(new PlayerDeathEvent(player, null, Collections.emptyList(), 0, DEATH_MESSAGE));
 
-    verify(httpHelper).fireAsyncPostRequestToServer(eq("Player/" + PLAYER_UUID.toString() + "/Death"), deathArgumentCaptor.capture(), runnableArgumentCaptor.capture());
-    Runnable runnable = runnableArgumentCaptor.getValue();
-    runnable.run();
+    verify(httpHelper).fireAsyncPostRequestToServer(eq("Player/" + PLAYER_UUID.toString() + "/Death"), deathArgumentCaptor.capture(), responseFunctionCaptor.capture());
+    when(httpResponse.body()).thenReturn("{\"id\":\"" + PLAYER_UUID + "\",\"reason\":\"" + DEATH_MESSAGE + "\",\"autoRevived\":false}");
+    responseFunctionCaptor.getValue().apply(httpResponse);
 
     Death death = deathArgumentCaptor.getValue();
     assertThat(death.getReason(), equalTo(DEATH_MESSAGE));
@@ -108,12 +117,7 @@ public class PlayerListenerTest {
 
     verify(messageHelper).sendDeathURL(player);
     verifyNoMoreInteractions(messageHelper);
-
-    verify(player, times(2)).getUniqueId();
-    verify(player).getName();
-    verify(player).getWorld();
-    verify(player).getLocation();
-    verifyNoMoreInteractions(player);
+    verifyNoInteractions(reanimationProtocol);
 
     verify(world).dropItem(eq(PLAYER_LOCATION), itemStackArgumentCaptor.capture());
     verifyNoMoreInteractions(world);
@@ -124,6 +128,34 @@ public class PlayerListenerTest {
     assertThat(skull.getItemMeta(), equalTo(skullMeta));
     verify(skullMeta).setLore(Collections.singletonList(DEATH_MESSAGE));
     verify(skullMeta).setOwningPlayer(player);
+  }
+
+  @Test
+  public void testOnPlayerDeath_AutoRevive_QueuesForRevivalAndBroadcastsCreditMessage() {
+    when(player.getServer()).thenReturn(server);
+    when(messageHelper.getCreditRevivalMessage(player)).thenReturn("credit-used-broadcast");
+    playerListener.onPlayerDeath(new PlayerDeathEvent(player, null, Collections.emptyList(), 0, DEATH_MESSAGE));
+
+    verify(httpHelper).fireAsyncPostRequestToServer(eq("Player/" + PLAYER_UUID.toString() + "/Death"), deathArgumentCaptor.capture(), responseFunctionCaptor.capture());
+    when(httpResponse.body()).thenReturn("{\"id\":\"" + PLAYER_UUID + "\",\"reason\":\"" + DEATH_MESSAGE + "\",\"autoRevived\":true}");
+    responseFunctionCaptor.getValue().apply(httpResponse);
+
+    verify(reanimationProtocol).queueForRevival(PLAYER_UUID);
+    verify(messageHelper).getCreditRevivalMessage(player);
+    verify(messageHelper, never()).sendDeathURL(player);
+    verify(server).broadcastMessage("credit-used-broadcast");
+  }
+
+  @Test
+  public void testOnPlayerDeath_MalformedResponse_FallsBackToDonationUrl() {
+    playerListener.onPlayerDeath(new PlayerDeathEvent(player, null, Collections.emptyList(), 0, DEATH_MESSAGE));
+
+    verify(httpHelper).fireAsyncPostRequestToServer(eq("Player/" + PLAYER_UUID.toString() + "/Death"), deathArgumentCaptor.capture(), responseFunctionCaptor.capture());
+    when(httpResponse.body()).thenReturn("not-json");
+    responseFunctionCaptor.getValue().apply(httpResponse);
+
+    verify(messageHelper).sendDeathURL(player);
+    verifyNoInteractions(reanimationProtocol);
   }
 
   @Test

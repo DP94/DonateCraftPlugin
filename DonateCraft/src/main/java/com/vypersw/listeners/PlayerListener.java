@@ -3,6 +3,7 @@ package com.vypersw.listeners;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vypersw.MessageHelper;
+import com.vypersw.ReanimationProtocol;
 import com.vypersw.network.HttpHelper;
 import com.vypersw.response.DCPlayer;
 import com.vypersw.response.Death;
@@ -24,12 +25,14 @@ public class PlayerListener implements Listener {
 
     private final MessageHelper messageHelper;
     private final HttpHelper httpHelper;
+    private final ReanimationProtocol reanimationProtocol;
 
     private Set<String> playerCache;
 
-    public PlayerListener(MessageHelper messageHelper, HttpHelper httpHelper) {
+    public PlayerListener(MessageHelper messageHelper, HttpHelper httpHelper, ReanimationProtocol reanimationProtocol) {
         this.messageHelper = messageHelper;
         this.httpHelper = httpHelper;
+        this.reanimationProtocol = reanimationProtocol;
         this.playerCache = new HashSet<>();
         this.loadPlayerCache();
     }
@@ -41,7 +44,20 @@ public class PlayerListener implements Listener {
         death.setId(player.getUniqueId());
         death.setPlayerName(player.getName());
         death.setReason(event.getDeathMessage());
-        httpHelper.fireAsyncPostRequestToServer("Player/" + player.getUniqueId().toString() + "/Death", death, () -> messageHelper.sendDeathURL(player));
+        httpHelper.fireAsyncPostRequestToServer("Player/" + player.getUniqueId().toString() + "/Death", death, response -> {
+            try {
+                Death responseDeath = new ObjectMapper().readValue(response.body(), Death.class);
+                if (responseDeath != null && responseDeath.isAutoRevived()) {
+                    player.getServer().broadcastMessage(messageHelper.getCreditRevivalMessage(player));
+                    reanimationProtocol.queueForRevival(player.getUniqueId());
+                    return null;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            messageHelper.sendDeathURL(player);
+            return null;
+        });
 
         dropSkull(player, event.getDeathMessage());
     }

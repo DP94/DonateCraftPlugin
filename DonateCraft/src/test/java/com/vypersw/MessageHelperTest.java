@@ -106,6 +106,13 @@ public class MessageHelperTest {
     }
 
     @Test
+    public void testCreditRevivalMessage() {
+        String result = messageHelper.getCreditRevivalMessage(player);
+        String expected = "§6Test§f spent a §arevival credit§f! They will be revived shortly (if they are online)";
+        assertEquals(expected, result);
+    }
+
+    @Test
     public void testSendDeathURL() {
       messageHelper.sendDeathURL(player);
 

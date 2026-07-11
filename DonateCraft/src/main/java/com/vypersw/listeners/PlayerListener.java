@@ -48,6 +48,7 @@ public class PlayerListener implements Listener {
             try {
                 Death responseDeath = new ObjectMapper().readValue(response.body(), Death.class);
                 if (responseDeath != null && responseDeath.isAutoRevived()) {
+                    player.getServer().broadcastMessage(messageHelper.getCreditRevivalMessage(player));
                     reanimationProtocol.queueForRevival(player.getUniqueId());
                     return null;
                 }

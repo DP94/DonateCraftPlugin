@@ -131,7 +131,9 @@ public class PlayerListenerTest {
   }
 
   @Test
-  public void testOnPlayerDeath_AutoRevive_QueuesForRevivalAndSkipsDonationUrl() {
+  public void testOnPlayerDeath_AutoRevive_QueuesForRevivalAndBroadcastsCreditMessage() {
+    when(player.getServer()).thenReturn(server);
+    when(messageHelper.getCreditRevivalMessage(player)).thenReturn("credit-used-broadcast");
     playerListener.onPlayerDeath(new PlayerDeathEvent(player, null, Collections.emptyList(), 0, DEATH_MESSAGE));
 
     verify(httpHelper).fireAsyncPostRequestToServer(eq("Player/" + PLAYER_UUID.toString() + "/Death"), deathArgumentCaptor.capture(), responseFunctionCaptor.capture());
@@ -139,7 +141,9 @@ public class PlayerListenerTest {
     responseFunctionCaptor.getValue().apply(httpResponse);
 
     verify(reanimationProtocol).queueForRevival(PLAYER_UUID);
-    verifyNoInteractions(messageHelper);
+    verify(messageHelper).getCreditRevivalMessage(player);
+    verify(messageHelper, never()).sendDeathURL(player);
+    verify(server).broadcastMessage("credit-used-broadcast");
   }
 
   @Test

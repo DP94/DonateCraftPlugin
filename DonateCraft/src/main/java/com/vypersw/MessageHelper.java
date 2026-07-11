@@ -17,6 +17,13 @@ public class MessageHelper {
         this.donationAmountFormat = new DecimalFormat("##.00");
     }
 
+    public String getCreditRevivalMessage(Player player) {
+        return ChatColor.GOLD + player.getName()
+                + ChatColor.WHITE + " spent a "
+                + ChatColor.GREEN + "revival credit"
+                + ChatColor.WHITE + "! They will be revived shortly (if they are online)";
+    }
+
     public void sendDeathURL(Player player) {
         String deathURL = serverURL + "charities?playerId=" + player.getUniqueId();
         TextComponent textComponent = new TextComponent("You died! Please click ");
